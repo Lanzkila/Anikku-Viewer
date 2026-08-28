@@ -137,3 +137,89 @@ footer{border-top:1px solid var(--line);display:flex;justify-content:space-betwe
     grid-template-columns:46px minmax(0,1fr);
   }
 }
+
+
+/* v0.1.3 — episode status pills + themed scrollbars */
+.episode-flags{
+  align-self:start;
+  align-items:flex-start;
+  align-content:flex-start;
+  min-height:0;
+}
+
+.flag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:auto;
+  height:auto;
+  min-height:22px;
+  line-height:1;
+  white-space:nowrap;
+  flex:0 0 auto;
+  padding:5px 7px;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--surface) 72%,transparent);
+}
+
+.flag.seen{
+  border-color:color-mix(in srgb,var(--ok) 38%,var(--line));
+  background:color-mix(in srgb,var(--ok) 8%,var(--surface));
+}
+
+.flag.filler{
+  border-color:color-mix(in srgb,var(--warn) 42%,var(--line));
+  background:color-mix(in srgb,var(--warn) 8%,var(--surface));
+}
+
+.flag.bookmark{
+  border-color:color-mix(in srgb,var(--accent2) 42%,var(--line));
+  background:color-mix(in srgb,var(--accent2) 8%,var(--surface));
+}
+
+/* Firefox */
+html,
+body,
+.modal-card,
+.raw-box,
+.subnav,
+#main-nav{
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb,var(--accent) 58%,var(--surface3)) var(--surface);
+}
+
+/* Chromium / Chrome / Edge / Android WebView */
+*::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+*::-webkit-scrollbar-track{
+  background:var(--surface);
+}
+
+*::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--accent) 52%,var(--surface3));
+  border:2px solid var(--surface);
+  border-radius:999px;
+}
+
+*::-webkit-scrollbar-thumb:hover{
+  background:color-mix(in srgb,var(--accent) 70%,var(--surface3));
+}
+
+*::-webkit-scrollbar-corner{
+  background:var(--surface);
+}
+
+.modal-card::-webkit-scrollbar-track{
+  background:var(--surface);
+  border-radius:0 20px 20px 0;
+}
+
+@media(max-width:760px){
+  .episode-flags{
+    align-self:start;
+    justify-content:flex-start;
+  }
+}

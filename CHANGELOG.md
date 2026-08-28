@@ -2,6 +2,14 @@
 
 All notable changes to **Kirin Anikku Backup Viewer** are documented here.
 
+## [0.1.3] - 2026-08-28
+
+### Fixed
+- Fixed episode `Seen`, `Filler`, and `Bookmark` badges stretching to the full height of the episode row.
+- Status badges now render as compact pill badges aligned to the top-right on desktop and top-left on mobile.
+- Replaced the default bright browser scrollbar with a theme-aware scrollbar for the page, Anime Details modal, raw inspector, tabs, and other scrollable areas.
+- Updated application/service-worker cache to `v013`.
+
 ## [0.1.2] - 2026-08-28
 
 ### Fixed

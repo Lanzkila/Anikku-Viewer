@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.2';
+  const VERSION = '0.1.3';
   const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v010';
   const TRACKERS = {
     1:'MyAnimeList', 2:'AniList', 3:'Kitsu', 4:'Shikimori', 5:'Bangumi',
@@ -686,7 +686,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=012',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=013',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
