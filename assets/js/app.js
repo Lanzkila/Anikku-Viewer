@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.3';
+  const VERSION = '0.1.5';
   const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v010';
   const TRACKERS = {
     1:'MyAnimeList', 2:'AniList', 3:'Kitsu', 4:'Shikimori', 5:'Bangumi',
@@ -299,6 +299,26 @@
   function trackerName(id) { return TRACKERS[num(id)] || `Tracker ${id}`; }
   function fetchTypeName(v) { return num(v) === 0 ? 'Seasons' : 'Episodes'; }
 
+  // Some Anikku/Aniyomi databases store the video position/duration in
+  // millisecond-like values even though the backup model exposes
+  // lastSecondSeen/totalSeconds. Keep raw backup data unchanged and only
+  // normalize values for display/statistics when the pair clearly looks x1000.
+  function episodeTimeScale(ep) {
+    const total=Math.max(0,num(ep?.totalSeconds));
+    const last=Math.max(0,num(ep?.lastSecondSeen));
+    const ref=Math.max(total,last);
+    if(ref < 60000) return 1;
+    const looksMillis =
+      (total >= 60000 && total % 1000 === 0) ||
+      (last >= 60000 && last % 1000 === 0) ||
+      (ref >= 300000 && ref / 1000 <= 43200);
+    return looksMillis ? 1000 : 1;
+  }
+
+  function episodeWatchSeconds(ep,field) {
+    return Math.max(0,num(ep?.[field])) / episodeTimeScale(ep);
+  }
+
   function formatDuration(seconds) {
     let s = Math.max(0,Math.floor(num(seconds)));
     const h=Math.floor(s/3600); s%=3600;
@@ -319,7 +339,11 @@
 
   function totalWatchSeconds() {
     return arr(state.data?.backupManga).reduce((sum,m)=>{
-      return sum + arr(m.episodes).reduce((s,e)=>s+(e.seen ? num(e.totalSeconds) : Math.min(num(e.lastSecondSeen),num(e.totalSeconds)||num(e.lastSecondSeen))),0);
+      return sum + arr(m.episodes).reduce((s,e)=>{
+        const total=episodeWatchSeconds(e,'totalSeconds');
+        const last=episodeWatchSeconds(e,'lastSecondSeen');
+        return s + (e.seen ? total : Math.min(last,total||last));
+      },0);
     },0);
   }
 
@@ -350,7 +374,7 @@
         <span class="continue-info">
           <strong>${esc(animeTitle(x.m))}</strong>
           <small>${esc(x.ep.name||`Episode ${x.ep.episodeNumber||''}`)}</small>
-          <small class="continue-time">${formatDuration(x.ep.lastSecondSeen)} / ${formatDuration(x.ep.totalSeconds)}</small>
+          <small class="continue-time">${formatDuration(episodeWatchSeconds(x.ep,'lastSecondSeen'))} / ${formatDuration(episodeWatchSeconds(x.ep,'totalSeconds'))}</small>
           <span class="progress continue-progress"><i style="width:${pct}%"></i></span>
         </span>
       </button>`;
@@ -525,7 +549,7 @@
           const q=$('#episode-search').value.trim().toLowerCase();
           const items=eps.filter(e=>`${e.name||''} ${e.summary||''} ${e.scanlator||''}`.toLowerCase().includes(q));
           $('#episode-list').innerHTML=items.map(e=>{
-            const total=num(e.totalSeconds),last=num(e.lastSecondSeen),pct=e.seen?100:(total?clamp(Math.round(last/total*100),0,100):0);
+            const total=episodeWatchSeconds(e,'totalSeconds'),last=episodeWatchSeconds(e,'lastSecondSeen'),pct=e.seen?100:(total?clamp(Math.round(last/total*100),0,100):0);
             return `<div class="episode-row"><div><strong>${esc(e.name||`Episode ${e.episodeNumber||''}`)}</strong><small>Episode ${esc(e.episodeNumber||'—')} · ${formatDate(e.dateUpload)}${e.scanlator?` · ${esc(e.scanlator)}`:''}</small>
               ${e.summary?`<small>${esc(e.summary)}</small>`:''}
               <div class="episode-progress"><span class="progress"><i style="width:${pct}%"></i></span><span>${formatDuration(last)} / ${formatDuration(total)}</span></div>
@@ -686,7 +710,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=013',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=015',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 

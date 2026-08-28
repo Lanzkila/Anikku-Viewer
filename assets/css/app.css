@@ -223,3 +223,283 @@ body,
     justify-content:flex-start;
   }
 }
+
+
+/* v0.1.4 — modal close button overlap fix */
+.modal-card{
+  padding-top:20px;
+  padding-right:72px;
+}
+
+.modal-close{
+  position:absolute;
+  top:16px;
+  right:16px;
+  float:none;
+  margin:0;
+  z-index:12;
+}
+
+.modal-close span{
+  display:block;
+}
+
+#modal-content,
+.theme-modal-card > :not(.modal-close){
+  position:relative;
+  z-index:1;
+}
+
+@media(max-width:760px){
+  .modal-card{
+    padding-top:18px;
+    padding-right:64px;
+  }
+
+  .modal-close{
+    top:12px;
+    right:12px;
+  }
+}
+
+
+/* v0.1.5 — larger typography + dashboard/modal spacing polish */
+body{
+  font-size:15px;
+  line-height:1.55;
+}
+
+.brand strong{font-size:14px}
+.brand small{font-size:11px}
+
+.eyebrow{
+  font-size:11px;
+  line-height:1.35;
+}
+
+.nav-btn,
+.outline-btn,
+.primary-btn,
+.subnav-btn,
+.filterbar select,
+.library-view-tools select{
+  font-size:14px;
+}
+
+.hero-card .lead{
+  font-size:16px;
+  line-height:1.6;
+}
+
+.drop-copy small,
+.home-features p,
+.privacy-card p,
+.privacy-card li{
+  font-size:13px;
+}
+
+.status-pill{
+  font-size:11px;
+}
+
+.stat-card{
+  padding:16px;
+}
+
+.stat-card strong{
+  font-size:24px;
+}
+
+.stat-card span{
+  font-size:12px;
+  line-height:1.35;
+}
+
+.panel-card,
+.tool-card{
+  line-height:1.55;
+}
+
+.panel-title h3,
+.tool-card h3{
+  font-size:16px;
+}
+
+.detail-row{
+  font-size:13px;
+}
+
+.continue-card{
+  padding:13px;
+  gap:12px;
+}
+
+.continue-info strong{
+  font-size:14px;
+  line-height:1.35;
+}
+
+.continue-info small{
+  font-size:12px;
+  line-height:1.4;
+  margin-top:2px;
+}
+
+.continue-time{
+  margin-top:3px!important;
+  font-size:11px!important;
+}
+
+.anime-card-body{
+  padding:11px;
+}
+
+.anime-card-body strong{
+  font-size:13px;
+  line-height:1.35;
+}
+
+.anime-meta{
+  font-size:11px;
+}
+
+.library-meta{
+  font-size:12px;
+}
+
+.explore-row strong{
+  font-size:14px;
+}
+
+.explore-row small{
+  font-size:12px;
+}
+
+.detail-title{
+  font-size:30px;
+}
+
+.chip{
+  font-size:11px;
+  padding:5px 9px;
+}
+
+.detail-grid{
+  gap:9px 16px;
+}
+
+.detail-grid div{
+  font-size:13px;
+  padding:8px 0;
+}
+
+.detail-grid b{
+  font-size:10px;
+  margin-bottom:2px;
+}
+
+.modal-tabs{
+  margin:18px 0 14px;
+  gap:8px;
+}
+
+.modal-tab{
+  font-size:13px;
+  padding:9px 13px;
+}
+
+.description{
+  font-size:14px;
+  line-height:1.65;
+}
+
+.episode-tools input{
+  font-size:14px;
+  padding:10px 12px;
+}
+
+.episode-row{
+  padding:13px 14px;
+  gap:14px;
+}
+
+.episode-row strong{
+  font-size:14px;
+  line-height:1.35;
+}
+
+.episode-row small{
+  font-size:12px;
+  line-height:1.45;
+}
+
+.episode-progress span{
+  font-size:10px;
+}
+
+.flag{
+  font-size:10px;
+  min-height:24px;
+  padding:6px 8px;
+}
+
+.tracking-card strong{
+  font-size:14px;
+}
+
+.tracking-card small{
+  font-size:12px;
+}
+
+.raw-box,
+.diagnostic-panel pre{
+  font-size:11px;
+  line-height:1.55;
+}
+
+footer{
+  font-size:12px;
+}
+
+/* Give the dashboard a little more breathing room. */
+.dashboard-grid{
+  gap:14px;
+}
+
+.continue-grid{
+  gap:11px;
+}
+
+.backup-head{
+  margin-bottom:24px;
+}
+
+.section-head{
+  margin-bottom:16px;
+}
+
+.modal-card{
+  padding-left:22px;
+  padding-bottom:22px;
+}
+
+.anime-hero-content{
+  gap:20px;
+  padding:20px;
+}
+
+@media(max-width:760px){
+  body{font-size:14px}
+  .brand strong{font-size:13px}
+  .hero-card .lead{font-size:15px}
+  .stat-card strong{font-size:22px}
+  .detail-title{font-size:24px}
+  .anime-hero-content{padding:14px;gap:14px}
+  .modal-card{padding-left:16px;padding-bottom:18px}
+  .episode-row{padding:12px}
+}
+
+@media(max-width:470px){
+  .anime-card-body strong{font-size:12px}
+  .anime-meta{font-size:10px}
+}
