@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.1';
+  const VERSION = '0.1.2';
   const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v010';
   const TRACKERS = {
     1:'MyAnimeList', 2:'AniList', 3:'Kitsu', 4:'Shikimori', 5:'Bangumi',
@@ -345,10 +345,14 @@
     $('#continue-watching').innerHTML = continueItems.length ? continueItems.slice(0,6).map(x=>{
       const pct=clamp(Math.round(x.progress*100),0,100);
       const cover=animeCover(x.m);
-      return `<button class="continue-card" data-open-anime="${x.mi}">
-        ${cover?`<img src="${esc(cover)}" alt="">`:'<span class="explore-icon">▶</span>'}
-        <span><strong>${esc(animeTitle(x.m))}</strong><small>${esc(x.ep.name||`Episode ${x.ep.episodeNumber||''}`)}</small>
-        <small>${formatDuration(x.ep.lastSecondSeen)} / ${formatDuration(x.ep.totalSeconds)}</small><span class="progress"><i style="width:${pct}%"></i></span></span>
+      return `<button class="continue-card" type="button" data-open-anime="${x.mi}">
+        <span class="continue-poster">${cover?`<img src="${esc(cover)}" alt="" loading="lazy">`:'<span class="continue-poster-fallback">▶</span>'}</span>
+        <span class="continue-info">
+          <strong>${esc(animeTitle(x.m))}</strong>
+          <small>${esc(x.ep.name||`Episode ${x.ep.episodeNumber||''}`)}</small>
+          <small class="continue-time">${formatDuration(x.ep.lastSecondSeen)} / ${formatDuration(x.ep.totalSeconds)}</small>
+          <span class="progress continue-progress"><i style="width:${pct}%"></i></span>
+        </span>
       </button>`;
     }).join('') : '<div class="muted">No partially watched episode stored in this backup.</div>';
 
@@ -682,7 +686,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=011',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=012',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 

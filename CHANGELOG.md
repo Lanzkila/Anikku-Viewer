@@ -2,6 +2,16 @@
 
 All notable changes to **Kirin Anikku Backup Viewer** are documented here.
 
+## [0.1.2] - 2026-08-28
+
+### Fixed
+- Fixed black text inside Dashboard `Continue Watching` cards by explicitly inheriting the active theme text color.
+- Rebuilt Continue Watching card markup into dedicated poster and content containers.
+- Fixed the watch progress bar escaping/collapsing into a vertical gradient strip.
+- Added width/min-width/overflow guards so long anime titles, episode names and watch times stay inside their cards.
+- Applied the same progress-bar block sizing safely across dashboard/library layouts.
+- Updated application/service-worker cache to `v012`.
+
 ## [0.1.1] - 2026-08-28
 
 ### Fixed
