@@ -8,6 +8,16 @@ syntax = "proto2";
  * are safely skipped by protobuf decoders.
  */
 
+
+/*
+ * Mirrors Anikku BackupDetector:
+ * - field 500 absent => default true => legacy
+ * - field 500 present false => current backup
+ */
+message BackupDetector {
+  optional bool isLegacy = 500 [default = true];
+}
+
 message Backup {
   optional bool isLegacy = 500 [default = false];
   repeated BackupManga backupManga = 501;

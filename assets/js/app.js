@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.1';
   const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v010';
   const TRACKERS = {
     1:'MyAnimeList', 2:'AniList', 3:'Kitsu', 4:'Shikimori', 5:'Bangumi',
@@ -28,6 +28,7 @@
     fileSize:0,
     format:'',
     schema:null,
+    detectorType:null,
     currentType:null,
     legacyType:null,
     sourceMap:new Map(),
@@ -95,6 +96,7 @@
     const source = await response.text();
     const parsed = protobuf.parse(source,{keepCase:true});
     state.schema = parsed.root;
+    state.detectorType = parsed.root.lookupType('BackupDetector');
     state.currentType = parsed.root.lookupType('Backup');
     state.legacyType = parsed.root.lookupType('LegacyBackup');
     log('Anikku protobuf schema loaded.');
@@ -137,32 +139,89 @@
       compression = 'GZIP protobuf';
     }
 
-    // Current Anikku root: fields 500-610.
+    // Match Anikku's own BackupDetector behavior exactly.
+    // The detector message defines field 500 with default=true:
+    // missing field 500 => legacy; field 500 encoded false => current.
+    let legacy = true;
     try {
-      const msg = state.currentType.decode(payload);
-      const plain = toPlain(state.currentType,msg);
-      const explicitlyCurrent = Object.prototype.hasOwnProperty.call(msg,'isLegacy');
-      if (explicitlyCurrent || meaningful(plain)) {
-        const normalized = normalizeBackup(plain);
-        normalized.__format = 'Anikku current';
-        return {data:normalized,format:`Anikku current · ${compression}`};
-      }
+      const detector = state.detectorType.decode(payload);
+      legacy = detector.isLegacy !== false;
+      log(`BackupDetector: ${legacy ? 'legacy' : 'current'} root.`);
     } catch (e) {
-      log(`Current root decode attempt: ${e.message}`);
+      log(`BackupDetector failed (${e.message}); trying both roots safely.`);
+      legacy = null;
     }
 
-    // Legacy root: fields 3/4/103...
-    try {
+    const decodeCurrent = () => {
+      const msg = state.currentType.decode(payload);
+      const plain = toPlain(state.currentType,msg);
+      const normalized = normalizeBackup(plain);
+      normalized.__format = 'Anikku current';
+      return {data:normalized,format:`Anikku current · ${compression}`};
+    };
+
+    const decodeLegacy = () => {
       const msg = state.legacyType.decode(payload);
       const plain = toPlain(state.legacyType,msg);
-      if (meaningful(plain)) {
-        const normalized = normalizeBackup(plain);
-        normalized.__format = 'Anikku legacy';
-        return {data:normalized,format:`Anikku legacy · ${compression}`};
+      const normalized = normalizeBackup(plain);
+      normalized.__format = 'Anikku legacy';
+      return {data:normalized,format:`Anikku legacy · ${compression}`};
+    };
+
+    if (legacy === false) {
+      try {
+        const result = decodeCurrent();
+        log(`Current root decoded: ${result.data.backupManga.length} anime.`);
+        return result;
+      } catch (e) {
+        log(`Current root decode failed: ${e.message}`);
+        // Fall through once for unusual/corrupt-but-readable backups.
+        try {
+          const fallback = decodeLegacy();
+          if (meaningful(fallback.data)) {
+            log('Legacy fallback succeeded after current decode failure.');
+            return fallback;
+          }
+        } catch {}
+        throw e;
       }
-    } catch (e) {
-      log(`Legacy root decode attempt: ${e.message}`);
     }
+
+    if (legacy === true) {
+      try {
+        const result = decodeLegacy();
+        log(`Legacy root decoded: ${result.data.backupManga.length} anime.`);
+        return result;
+      } catch (e) {
+        log(`Legacy root decode failed: ${e.message}`);
+        try {
+          const fallback = decodeCurrent();
+          if (meaningful(fallback.data)) {
+            log('Current fallback succeeded after legacy decode failure.');
+            return fallback;
+          }
+        } catch {}
+        throw e;
+      }
+    }
+
+    // Detector itself failed: compare both candidates and prefer the one
+    // containing actual anime/category/source data rather than shared 600/610 fields.
+    let currentCandidate=null, legacyCandidate=null;
+    try { currentCandidate=decodeCurrent(); } catch(e) { log(`Current candidate: ${e.message}`); }
+    try { legacyCandidate=decodeLegacy(); } catch(e) { log(`Legacy candidate: ${e.message}`); }
+
+    const rootScore = result => {
+      if (!result) return -1;
+      const d=result.data;
+      return arr(d.backupManga).length*1000000 +
+        arr(d.backupCategories).length*1000 +
+        arr(d.backupSources).length*100 +
+        arr(d.backupSavedSearches).length +
+        arr(d.backupFeeds).length;
+    };
+    if (rootScore(legacyCandidate) > rootScore(currentCandidate)) return legacyCandidate;
+    if (rootScore(currentCandidate) >= 0) return currentCandidate;
 
     throw new Error('This file did not match the current or legacy Anikku backup root.');
   }
@@ -531,6 +590,9 @@
       showLoading('Indexing anime library…',68);
       state.data=decoded.data;
       state.format=decoded.format;
+      if (!arr(state.data.backupManga).length) {
+        log(`Decoded ${decoded.format} but found 0 anime. Categories=${arr(state.data.backupCategories).length}, Sources=${arr(state.data.backupSources).length}, Feeds=${arr(state.data.backupFeeds).length}, SavedSearches=${arr(state.data.backupSavedSearches).length}`);
+      }
       buildIndexes();
       populateFilters();
       state.page=1;
@@ -545,9 +607,15 @@
       $('#home-view').classList.add('hidden');
       $('#app-view').classList.remove('hidden');
       switchView('dashboard');
-      diag(`${decoded.format} loaded ✓`);
+      const animeCount=arr(state.data.backupManga).length;
+      if (animeCount) {
+        diag(`${decoded.format} loaded ✓ · ${animeCount.toLocaleString()} anime.`);
+        toast('Anikku backup loaded');
+      } else {
+        diag(`${decoded.format} decoded, but this backup contains 0 library anime. Check Decoder diagnostic.`, true);
+        toast('Backup decoded with empty library');
+      }
       hideLoading();
-      toast('Anikku backup loaded');
     } catch(error) {
       console.error(error);
       hideLoading();
@@ -614,7 +682,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=010',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=011',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
