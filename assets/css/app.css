@@ -503,3 +503,269 @@ footer{
   .anime-card-body strong{font-size:12px}
   .anime-meta{font-size:10px}
 }
+
+
+/* v0.2.0 — Library upgrade + theme-safe card text */
+.library-view-tools{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.compact-control{
+  padding:9px 12px;
+}
+
+.layout-switch{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:3px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface);
+}
+
+.layout-btn{
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:900;
+  padding:0;
+}
+
+.layout-btn:hover{
+  color:var(--text);
+  background:var(--surface2);
+}
+
+.layout-btn.active{
+  background:var(--accent);
+  color:#fff;
+}
+
+.library-quickbar{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  overflow-x:auto;
+  padding:2px 0 8px;
+  margin-bottom:3px;
+  scrollbar-width:thin;
+}
+
+.quick-filter{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface);
+  color:var(--muted);
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.quick-filter span{
+  min-width:20px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:var(--surface2);
+  color:var(--text);
+  font-size:10px;
+  line-height:1.2;
+  text-align:center;
+}
+
+.quick-filter:hover{
+  color:var(--text);
+  border-color:color-mix(in srgb,var(--accent) 35%,var(--line));
+}
+
+.quick-filter.active{
+  color:var(--accent);
+  border-color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 8%,var(--surface));
+}
+
+.quick-filter.active span{
+  background:var(--accent);
+  color:#fff;
+}
+
+/* Fix: anime-card is a button, so explicitly use theme colors. */
+.anime-card{
+  appearance:none;
+  -webkit-appearance:none;
+  color:var(--text)!important;
+  text-align:left;
+  padding:0;
+  font:inherit;
+}
+
+.anime-card,
+.anime-card *{
+  box-sizing:border-box;
+}
+
+.anime-card-body{
+  color:var(--text);
+}
+
+.anime-card-body strong{
+  color:var(--text)!important;
+}
+
+.anime-meta,
+.anime-meta span{
+  color:var(--muted)!important;
+}
+
+.anime-cover-fallback{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  color:var(--accent);
+  font-size:26px;
+  background:linear-gradient(145deg,var(--surface2),var(--surface3));
+}
+
+.library-flags{
+  position:absolute;
+  top:8px;
+  right:8px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:4px;
+  max-width:75%;
+}
+
+.library-flag{
+  display:inline-flex;
+  align-items:center;
+  min-height:20px;
+  padding:4px 6px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  background:rgba(5,8,14,.82);
+  color:#fff;
+  font-size:8px;
+  line-height:1;
+  font-weight:900;
+  backdrop-filter:blur(4px);
+}
+
+.library-flag.watching{color:#7ee7ff}
+.library-flag.bookmark{color:#ffd76d}
+.library-flag.filler{color:#ffc46b}
+
+.anime-progress-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+  margin-top:8px;
+}
+
+.anime-progress-row .progress{
+  margin:0;
+}
+
+.anime-progress-row small{
+  color:var(--muted);
+  font-size:10px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Compact library layout */
+.anime-grid.compact{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+
+.anime-grid.compact .anime-card{
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  align-items:stretch;
+  min-height:112px;
+}
+
+.anime-grid.compact .anime-cover-wrap{
+  aspect-ratio:auto;
+  width:76px;
+  height:112px;
+  border-radius:0;
+}
+
+.anime-grid.compact .anime-card-body{
+  display:flex;
+  min-width:0;
+  flex-direction:column;
+  justify-content:center;
+  padding:12px;
+}
+
+.anime-grid.compact .anime-card-body strong{
+  min-height:0;
+  -webkit-line-clamp:2;
+}
+
+.anime-grid.compact .anime-badge{
+  left:5px;
+  bottom:5px;
+  font-size:8px;
+  padding:3px 5px;
+}
+
+.anime-grid.compact .library-flags{
+  top:5px;
+  right:5px;
+}
+
+@media(max-width:760px){
+  .library-view-tools{
+    justify-content:flex-start;
+  }
+
+  .quick-filter{
+    font-size:11px;
+  }
+
+  .anime-grid.compact{
+    grid-template-columns:1fr;
+  }
+
+  .anime-grid.compact .anime-card{
+    grid-template-columns:70px minmax(0,1fr);
+    min-height:104px;
+  }
+
+  .anime-grid.compact .anime-cover-wrap{
+    width:70px;
+    height:104px;
+  }
+}
+
+@media(max-width:470px){
+  .library-view-tools{
+    width:100%;
+  }
+
+  .library-view-tools select{
+    flex:1;
+  }
+
+  .quick-filter{
+    padding:6px 9px;
+  }
+}

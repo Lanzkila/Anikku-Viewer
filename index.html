@@ -8,14 +8,14 @@
   <meta name="application-name" content="Kirin Anikku Backup Viewer">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="./manifest.webmanifest?v=015">
+  <link rel="manifest" href="./manifest.webmanifest?v=020">
   <link rel="icon" href="./assets/icons/app-icon.svg" type="image/svg+xml">
   <title>Kirin Anikku Backup Viewer</title>
-  <link rel="stylesheet" href="./assets/css/app.css?v=015">
+  <link rel="stylesheet" href="./assets/css/app.css?v=020">
   <script defer src="https://cdn.jsdelivr.net/npm/long@5.2.3/umd/index.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/protobufjs@7.5.4/dist/protobuf.min.js"></script>
   <script defer src="./assets/vendor/pako.min.js"></script>
-  <script defer src="./assets/js/app.js?v=015"></script>
+  <script defer src="./assets/js/app.js?v=020"></script>
 </head>
 <body>
   <div class="shell">
@@ -42,7 +42,7 @@
     <main>
       <section id="home-view" class="home-grid">
         <article class="hero-card">
-          <div class="eyebrow">KIRIN ANIKKU BACKUP VIEWER · v0.1.5 UI POLISH</div>
+          <div class="eyebrow">KIRIN ANIKKU BACKUP VIEWER · v0.2.0 LIBRARY UPGRADE</div>
           <h1>Your Anikku anime library, decoded locally.</h1>
           <p class="lead">Open an Anikku <code>.tachibk</code>, GZIP protobuf, raw protobuf or decoded JSON. Current and legacy Anikku backup roots are detected automatically.</p>
 
@@ -120,7 +120,12 @@
           <div class="section-head">
             <div><div class="eyebrow">ANIME LIBRARY</div><h2>Browse backup</h2></div>
             <div class="library-view-tools">
-              <select id="page-size"><option>24</option><option>48</option><option>96</option></select>
+              <button id="recent-library" class="outline-btn compact-control" type="button" title="Sort by recently watched">Recent</button>
+              <div class="layout-switch" aria-label="Library layout">
+                <button id="layout-grid" class="layout-btn active" type="button" title="Grid view" aria-label="Grid view">▦</button>
+                <button id="layout-compact" class="layout-btn" type="button" title="Compact view" aria-label="Compact view">☷</button>
+              </div>
+              <select id="page-size" aria-label="Items per page"><option>24</option><option>48</option><option>96</option></select>
             </div>
           </div>
 
@@ -142,6 +147,16 @@
               <option value="unseen">Most unseen</option>
               <option value="added">Recently added</option>
             </select>
+          </div>
+
+          <div id="library-quickbar" class="library-quickbar" aria-label="Quick filters">
+            <button class="quick-filter active" data-quick-filter="all">All <span data-quick-count="all">0</span></button>
+            <button class="quick-filter" data-quick-filter="unseen">Unseen <span data-quick-count="unseen">0</span></button>
+            <button class="quick-filter" data-quick-filter="watching">Watching <span data-quick-count="watching">0</span></button>
+            <button class="quick-filter" data-quick-filter="seen">Seen <span data-quick-count="seen">0</span></button>
+            <button class="quick-filter" data-quick-filter="bookmarked">Bookmarked <span data-quick-count="bookmarked">0</span></button>
+            <button class="quick-filter" data-quick-filter="filler">Filler <span data-quick-count="filler">0</span></button>
+            <button class="quick-filter" data-quick-filter="tracked">Tracked <span data-quick-count="tracked">0</span></button>
           </div>
 
           <div id="library-meta" class="library-meta"></div>
@@ -176,7 +191,7 @@
 
     <footer>
       <span>© <span id="footer-year"></span> Kirin Anikku Backup Viewer</span>
-      <span>v0.1.5 · client-side · GPL-2.0</span>
+      <span>v0.2.0 · client-side · GPL-2.0</span>
     </footer>
   </div>
 

@@ -2,6 +2,25 @@
 
 All notable changes to **Kirin Anikku Backup Viewer** are documented here.
 
+## [0.2.0] - 2026-08-28
+
+### Fixed
+- Fixed black text inside Anime Library cards by explicitly applying the active theme text and muted colors to the button-based cards.
+- Added theme-safe styling for anime title, source metadata and progress labels.
+
+### Added
+- Added Library quick filters: All, Unseen, Watching, Seen, Bookmarked, Filler and Tracked.
+- Added live global counts to each quick-filter chip.
+- Added Grid and Compact library layouts.
+- The selected Library layout is remembered in local storage.
+- Added a `Recent` shortcut that immediately sorts the Library by recently watched anime.
+- Added per-card Watching, Bookmark and Filler indicators.
+- Added visible percentage next to each anime progress bar.
+
+### Changed
+- Compact layout uses horizontal poster cards and switches to one column on mobile.
+- Updated application/service-worker cache to `v020`.
+
 ## [0.1.5] - 2026-08-28
 
 ### Fixed

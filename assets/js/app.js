@@ -1,8 +1,8 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.5';
-  const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v010';
+  const VERSION = '0.2.0';
+  const SETTINGS_KEY = 'kirin-anikku-viewer-settings-v020';
   const TRACKERS = {
     1:'MyAnimeList', 2:'AniList', 3:'Kitsu', 4:'Shikimori', 5:'Bangumi',
     101:'Simkl', 102:'Jellyfin'
@@ -36,9 +36,11 @@
     filtered:[],
     page:1,
     pageSize:24,
+    quickFilter:'all',
+    libraryLayout:'grid',
     currentView:'dashboard',
     exploreTab:'categories',
-    settings:{theme:'night'},
+    settings:{theme:'night',libraryLayout:'grid'},
     debug:[],
   };
 
@@ -76,7 +78,10 @@
   function loadSettings() {
     try { state.settings = {...state.settings,...JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')}; } catch {}
     if (!THEMES.includes(state.settings.theme)) state.settings.theme='night';
+    if (!['grid','compact'].includes(state.settings.libraryLayout)) state.settings.libraryLayout='grid';
+    state.libraryLayout=state.settings.libraryLayout;
     applyTheme(state.settings.theme);
+    applyLibraryLayout(false);
   }
 
   function applyTheme(theme) {
@@ -403,11 +408,66 @@
     ).join('') || '<div class="muted">No tracking data.</div>';
   }
 
+  function animeHasBookmark(m) {
+    return arr(m.episodes).some(e=>e.bookmark);
+  }
+
+  function animeHasFiller(m) {
+    return arr(m.episodes).some(e=>e.fillermark || e.fillermarkLegacy);
+  }
+
+  function updateQuickFilterCounts() {
+    if (!state.data) return;
+    const anime=arr(state.data.backupManga);
+    const counts={
+      all:anime.length,
+      unseen:anime.filter(m=>unseenCount(m)>0).length,
+      watching:anime.filter(m=>partialEpisodes(m).length>0).length,
+      seen:anime.filter(m=>arr(m.episodes).length>0 && seenCount(m)===arr(m.episodes).length).length,
+      bookmarked:anime.filter(animeHasBookmark).length,
+      filler:anime.filter(animeHasFiller).length,
+      tracked:anime.filter(m=>arr(m.tracking).length>0).length,
+    };
+    Object.entries(counts).forEach(([key,value])=>{
+      const el=document.querySelector(`[data-quick-count="${key}"]`);
+      if(el) el.textContent=Number(value).toLocaleString();
+    });
+  }
+
+  function setQuickFilter(filter='all',apply=true) {
+    state.quickFilter=filter;
+    $$('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.quickFilter===filter));
+    if(apply && state.data) applyLibraryFilters(true);
+  }
+
+  function applyLibraryLayout(save=true) {
+    const grid=$('#anime-grid');
+    if(grid) grid.classList.toggle('compact',state.libraryLayout==='compact');
+    $('#layout-grid')?.classList.toggle('active',state.libraryLayout==='grid');
+    $('#layout-compact')?.classList.toggle('active',state.libraryLayout==='compact');
+    if(save) saveSettings({libraryLayout:state.libraryLayout});
+  }
+
+  function setLibraryLayout(layout) {
+    state.libraryLayout=layout==='compact'?'compact':'grid';
+    applyLibraryLayout(true);
+  }
+
+  function showRecentlyWatched() {
+    if(!state.data) return;
+    $('#sort-filter').value='recent';
+    $('#progress-filter').value='all';
+    setQuickFilter('all',false);
+    applyLibraryFilters(true);
+    toast('Sorted by recently watched');
+  }
+
   function populateFilters() {
     $('#category-filter').innerHTML = '<option value="all">All categories</option>' +
       arr(state.data.backupCategories).sort((a,b)=>num(a.order)-num(b.order)).map(c=>`<option value="${esc(key64(c.order))}">${esc(c.name||'Unnamed')}</option>`).join('');
     $('#source-filter').innerHTML = '<option value="all">All sources</option>' +
       [...state.sourceMap].sort((a,b)=>a[1].localeCompare(b[1])).map(([id,name])=>`<option value="${esc(id)}">${esc(name)}</option>`).join('');
+    updateQuickFilterCounts();
   }
 
   function applyLibraryFilters(resetPage=false) {
@@ -430,6 +490,14 @@
       if(progress==='watching' && !partial) return false;
       if(progress==='seen' && !(eps.length && seen===eps.length)) return false;
       if(progress==='tracked' && !arr(m.tracking).length) return false;
+
+      const quick=state.quickFilter;
+      if(quick==='unseen' && !unseen) return false;
+      if(quick==='watching' && !partial) return false;
+      if(quick==='seen' && !(eps.length && seen===eps.length)) return false;
+      if(quick==='bookmarked' && !animeHasBookmark(m)) return false;
+      if(quick==='filler' && !animeHasFiller(m)) return false;
+      if(quick==='tracked' && !arr(m.tracking).length) return false;
       return true;
     });
 
@@ -456,9 +524,18 @@
     $('#anime-grid').innerHTML = slice.map(({m,index})=>{
       const eps=arr(m.episodes),seen=seenCount(m),unseen=unseenCount(m),cover=animeCover(m);
       const pct=eps.length?Math.round(seen/eps.length*100):0;
-      return `<button class="anime-card" data-open-anime="${index}">
-        <div class="anime-cover-wrap">${cover?`<img class="anime-cover" src="${esc(cover)}" loading="lazy" alt="">`:''}<span class="anime-badge">${unseen.toLocaleString()} unseen</span></div>
-        <div class="anime-card-body"><strong>${esc(animeTitle(m))}</strong><div class="anime-meta"><span>${esc(sourceName(m))}</span><span>${seen}/${eps.length}</span></div><span class="progress"><i style="width:${pct}%"></i></span></div>
+      const flags=[
+        partialEpisodes(m).length?'<span class="library-flag watching">Watching</span>':'',
+        animeHasBookmark(m)?'<span class="library-flag bookmark">★</span>':'',
+        animeHasFiller(m)?'<span class="library-flag filler">Filler</span>':''
+      ].filter(Boolean).join('');
+      return `<button class="anime-card" type="button" data-open-anime="${index}">
+        <div class="anime-cover-wrap">${cover?`<img class="anime-cover" src="${esc(cover)}" loading="lazy" alt="">`:'<span class="anime-cover-fallback">▶</span>'}<span class="anime-badge">${unseen.toLocaleString()} unseen</span>${flags?`<span class="library-flags">${flags}</span>`:''}</div>
+        <div class="anime-card-body">
+          <strong>${esc(animeTitle(m))}</strong>
+          <div class="anime-meta"><span>${esc(sourceName(m))}</span><span>${seen}/${eps.length}</span></div>
+          <div class="anime-progress-row"><span class="progress"><i style="width:${pct}%"></i></span><small>${pct}%</small></div>
+        </div>
       </button>`;
     }).join('') || '<div class="muted">No anime matches the current filters.</div>';
 
@@ -468,6 +545,7 @@
     for(let p=from;p<=to;p++) pageButtons.push(`<button data-page="${p}" class="${p===state.page?'active':''}">${p}</button>`);
     pageButtons.push(`<button data-page="${Math.min(pages,state.page+1)}">›</button>`);
     $('#pager').innerHTML=pageButtons.join('');
+    applyLibraryLayout(false);
   }
 
   function renderExplore(tab=state.exploreTab) {
@@ -624,6 +702,8 @@
       buildIndexes();
       populateFilters();
       state.page=1;
+      state.quickFilter='all';
+      setQuickFilter('all',false);
       state.pageSize=num($('#page-size').value)||24;
       state.filtered=arr(state.data.backupManga).map((m,index)=>({m,index}));
       showLoading('Building dashboard…',90);
@@ -697,6 +777,10 @@
     ['search-input','category-filter','source-filter','progress-filter','sort-filter'].forEach(id=>{
       $(`#${id}`).addEventListener(id==='search-input'?'input':'change',()=>applyLibraryFilters(true));
     });
+    $$('.quick-filter').forEach(b=>b.addEventListener('click',()=>setQuickFilter(b.dataset.quickFilter)));
+    $('#layout-grid').addEventListener('click',()=>setLibraryLayout('grid'));
+    $('#layout-compact').addEventListener('click',()=>setLibraryLayout('compact'));
+    $('#recent-library').addEventListener('click',showRecentlyWatched);
     $('#page-size').addEventListener('change',()=>{state.pageSize=num($('#page-size').value)||24;state.page=1;renderLibrary();});
     $('#pager').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=num(b.dataset.page)||1;renderLibrary();window.scrollTo({top:150,behavior:'smooth'});});
     $('#anime-grid').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
@@ -710,7 +794,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=015',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=020',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 

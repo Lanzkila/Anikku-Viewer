@@ -10,18 +10,21 @@ A client-side backup viewer for **Anikku**, focused on anime/video library metad
 | --- | --- |
 | Project | Kirin Anikku Backup Viewer |
 | Repository | `Lanzkila/Kirin-Anikku-Backup-Viewer` |
-| Current build | v0.1.0 Foundation |
+| Current build | v0.2.0 Library Upgrade |
 | App type | Static client-side web app / PWA |
 | Deployment | GitHub Pages |
 | License | GPL-2.0 |
 
-## v0.1.0 features
+## Current features
 
 - Current Anikku backup root detection (`500–610` series)
 - Legacy Anikku backup root detection
 - `.tachibk`, GZIP protobuf, raw protobuf and decoded JSON input
 - Anime dashboard
 - Anime library with search, filters, sorting and pagination
+- Library quick filters: All, Unseen, Watching, Seen, Bookmarked, Filler and Tracked
+- Grid / Compact library layouts with remembered layout preference
+- Recently Watched shortcut and clearer per-anime progress badges
 - Continue Watching from stored episode progress
 - Episode metadata:
   - seen / unseen
