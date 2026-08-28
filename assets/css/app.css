@@ -769,3 +769,48 @@ footer{
     padding:6px 9px;
   }
 }
+
+
+/* v0.2.1 — close button overlays inside modal; no reserved empty strip */
+.modal-card{
+  padding-right:22px!important;
+}
+
+.modal-close{
+  position:absolute!important;
+  top:14px!important;
+  right:14px!important;
+  margin:0!important;
+  float:none!important;
+  z-index:30!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.28);
+  backdrop-filter:blur(8px);
+}
+
+/* Anime modal: let the X sit directly on the hero/card area. */
+#anime-modal .modal-close{
+  background:color-mix(in srgb,var(--surface) 78%,transparent);
+  border-color:color-mix(in srgb,var(--line) 78%,transparent);
+}
+
+/* Theme modal uses the same in-card overlay approach. */
+#theme-modal .modal-close{
+  background:color-mix(in srgb,var(--surface2) 88%,transparent);
+}
+
+/* No artificial right-side gap for modal content. */
+#modal-content,
+.theme-modal-card > :not(.modal-close){
+  padding-right:0!important;
+}
+
+@media(max-width:760px){
+  .modal-card{
+    padding-right:16px!important;
+  }
+
+  .modal-close{
+    top:10px!important;
+    right:10px!important;
+  }
+}

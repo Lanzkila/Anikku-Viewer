@@ -2,6 +2,15 @@
 
 All notable changes to **Kirin Anikku Backup Viewer** are documented here.
 
+## [0.2.1] - 2026-08-28
+
+### Changed
+- Moved modal `×` close buttons directly inside the modal/card as an overlay.
+- Removed the dedicated empty right-side strip previously reserved for the close button.
+- Anime Details and Theme modal content can now use the full card width.
+- Close buttons keep a compact top-right position on desktop and mobile.
+- Updated application/service-worker cache to `v021`.
+
 ## [0.2.0] - 2026-08-28
 
 ### Fixed

@@ -1,8 +1,8 @@
-const CACHE='kirin-anikku-v020';
+const CACHE='kirin-anikku-v021';
 const SHELL=[
-  './','./index.html','./assets/css/app.css?v=020','./assets/js/app.js?v=020',
+  './','./index.html','./assets/css/app.css?v=021','./assets/js/app.js?v=021',
   './assets/vendor/pako.min.js','./assets/icons/app-icon.svg','./schemas/schema-anikku.proto',
-  './manifest.webmanifest?v=020'
+  './manifest.webmanifest?v=021'
 ];
 const CDN=[
   'https://cdn.jsdelivr.net/npm/long@5.2.3/umd/index.min.js',
