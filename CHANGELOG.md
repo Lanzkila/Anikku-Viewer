@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.1] - 2026-09-05
+
+### Fixed
+- Matched Anikku's floating `↑ / ↓` scroll controls to Komikku behavior.
+- `↑` now becomes dark/disabled when the page is already at the top.
+- `↓` now becomes dark/disabled when the page reaches the bottom.
+- Both buttons remain active while the page is between the top and bottom.
+- Scroll state refreshes on scrolling, resize, backup/content layout changes, and dynamic rendering.
+- Updated PWA cache to `kirin-anikku-v031`.
+
 ## [0.3.0] - 2026-09-05
 
 ### Added
