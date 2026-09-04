@@ -1,123 +1,41 @@
 # Kirin Anikku Backup Viewer
 
-A client-side backup viewer for **Anikku**, focused on anime/video library metadata, episodes, watch progress, seasons, tracking, sources, feeds and saved searches.
+Client-side **Anikku** backup viewer focused on anime/video metadata, episodes, watch progress, seasons, tracking and backup analysis. Viewer only; it does not stream or download episodes.
 
-> Viewer only. It does not stream anime, resolve video hosts, or download episodes.
+## Current build
 
-## Repository
+**v0.3.0 — Watch & Backup Intelligence**
 
-| Item | Details |
-| --- | --- |
-| Project | Kirin Anikku Backup Viewer |
-| Repository | `Lanzkila/Kirin-Anikku-Backup-Viewer` |
-| Current build | v0.2.0 Library Upgrade |
-| App type | Static client-side web app / PWA |
-| Deployment | GitHub Pages |
-| License | GPL-2.0 |
+Repository: `Lanzkila/Anikku-Viewer`
 
-## Current features
+## Main features
 
-- Current Anikku backup root detection (`500–610` series)
-- Legacy Anikku backup root detection
-- `.tachibk`, GZIP protobuf, raw protobuf and decoded JSON input
-- Anime dashboard
-- Anime library with search, filters, sorting and pagination
-- Library quick filters: All, Unseen, Watching, Seen, Bookmarked, Filler and Tracked
-- Grid / Compact library layouts with remembered layout preference
-- Recently Watched shortcut and clearer per-anime progress badges
-- Continue Watching from stored episode progress
-- Episode metadata:
-  - seen / unseen
-  - watch position
-  - total duration
-  - filler mark
-  - bookmark
-  - episode number
-  - upload date
-  - summary
-  - preview URL presence
-- Anime metadata:
-  - poster / custom poster
-  - background art
-  - season number
-  - season parent ID
-  - fetch type (Seasons / Episodes)
-  - source / categories / genres
-- Tracking:
-  - MyAnimeList
-  - AniList
-  - Kitsu
-  - Shikimori
-  - Bangumi
-  - Simkl
-  - Jellyfin
-- Explore:
-  - Categories
-  - Sources
-  - Trackers
-  - Feeds
-  - Saved Searches
-- Decoded JSON export
-- Seven themes
-- Responsive desktop + mobile layout
-- PWA shell caching after initial successful online load
-- Local browser processing
+- Current + legacy Anikku root detection
+- `.tachibk`, GZIP/raw protobuf and JSON input
+- Dashboard, Library, Explore, Tools, seven themes and responsive mobile/desktop UI
+- Watch Center: premium Continue Watching, watch history, watch analytics, streak and 52-week heatmap
+- Episode Center: Seen/Unseen/Watching/Filler/Bookmark/Invalid-progress filters and sorting
+- Season Explorer and parent/child relationship view with broken-parent detection
+- Tracker Center for MyAnimeList, AniList, Kitsu, Shikimori, Bangumi, Simkl and Jellyfin
+- Source Health plus Feed/Saved Search inspection
+- Local pins, custom collections, bulk selection and in-memory delete
+- Snapshot Vault, two-backup compare, duplicate resolution, Repair Center, integrity grade, Undo/reset and change-session log
+- Quick Preview and keyboard library navigation
+- **Cover Recovery Center** with custom poster → poster → background fallback, URL normalization/retry, missing/broken detection, local URL/image override and override export/import
+- Watch-position unit normalization is retained for backups that store x1000 millisecond-like values
+
+## Export safety
+
+Decoded/working JSON export is available. `.tachibk` re-encoding is intentionally still disabled until the Anikku preservation schema covers every field that must survive a round trip.
 
 ## Privacy
 
-Selected backup files are decoded inside the current browser tab. There is no custom backend upload step in this project.
+Backup decoding stays in the browser. Pins, collections, snapshots and cover overrides are local viewer data.
 
-Only viewer appearance/settings may be stored in browser local storage. The loaded backup itself is not persisted to local storage.
+## PWA / update note
 
-## Backup compatibility notes
-
-Anikku's current backup root differs from Mihon/Komikku-style roots. Current Anikku stores the main anime library at protobuf field `501`, categories at `502`, and sources at `503`. The viewer also attempts the older legacy root automatically.
-
-Episode metadata uses the Anikku/Aniyomi video-oriented fields such as seen state, last watched second, total seconds, filler mark, summary and preview URL.
-
-v0.1.0 intentionally does **not** re-encode `.tachibk` yet. Unknown protobuf fields are skipped safely by the decoder, but a future re-encoder must model every field that needs to be preserved.
-
-## GitHub Pages
-
-For the simplest deployment on this static project:
-
-1. Upload the repository files to `main`.
-2. Open **Settings → Pages**.
-3. Choose **Deploy from a branch**.
-4. Select `main` and `/ (root)`.
-
-No custom Pages workflow is required for v0.1.0.
-
-## Project structure
-
-```text
-Kirin-Anikku-Backup-Viewer/
-├─ index.html
-├─ README.md
-├─ CHANGELOG.md
-├─ LICENSE
-├─ manifest.webmanifest
-├─ sw.js
-├─ .nojekyll
-├─ schemas/
-│  └─ schema-anikku.proto
-└─ assets/
-   ├─ css/
-   │  └─ app.css
-   ├─ js/
-   │  └─ app.js
-   ├─ icons/
-   │  └─ app-icon.svg
-   └─ vendor/
-      └─ pako.min.js
-```
-
-## Source references
-
-The backup field mapping used by this viewer follows the open-source Anikku backup models from `komikku-app/anikku`.
-
-Anikku itself is an independent open-source project. This viewer is not an official Anikku application.
+v0.3.0 is loaded as an additive suite by the updated service worker so the stable v0.2.1 core files remain untouched. After replacing the patch files on GitHub Pages, refresh once after the new service worker activates.
 
 ## License
 
-This viewer is distributed under **GNU GPL v2.0**. See [`LICENSE`](./LICENSE).
+GPL-2.0.
