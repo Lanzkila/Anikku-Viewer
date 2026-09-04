@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 if(window.__KIRIN_ANK_V030__)return;window.__KIRIN_ANK_V030__=true;
-const VERSION='0.3.0',STORE='kirin-ank-v030',DAY=86400000;const TRACKERS={1:'MyAnimeList',2:'AniList',3:'Kitsu',4:'Shikimori',5:'Bangumi',101:'Simkl',102:'Jellyfin'};
+const VERSION='0.3.2',STORE='kirin-ank-v030',DAY=86400000;const TRACKERS={1:'MyAnimeList',2:'AniList',3:'Kitsu',4:'Shikimori',5:'Bangumi',101:'Simkl',102:'Jellyfin'};
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],A=v=>Array.isArray(v)?v:[],N=v=>Number(v||0),S=v=>v==null?'':String(v),norm=v=>S(v).trim().toLowerCase().replace(/\s+/g,' '),esc=v=>S(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=v=>typeof structuredClone==='function'?structuredClone(v):JSON.parse(JSON.stringify(v));const key=m=>`${S(m?.source)}|${S(m?.url)}`;
 function L(k,d){try{return JSON.parse(localStorage.getItem(`${STORE}:${k}`)||'null')??d}catch{return d}}function SV(k,v){try{localStorage.setItem(`${STORE}:${k}`,JSON.stringify(v));return true}catch{toast('Browser storage full');return false}}
@@ -22,7 +22,7 @@ function plain(T,msg){return T.toObject(msg,{longs:String,enums:Number,bytes:Str
 async function decodeFile(file){const raw=new Uint8Array(await file.arrayBuffer());if(isJson(raw)||/\.json$/i.test(file.name)){const x=JSON.parse(new TextDecoder().decode(raw));return {data:normalize(x.data||x),format:'JSON'}}let p=raw,comp='raw protobuf';if(raw[0]===31&&raw[1]===139){p=window.pako?.ungzip?window.pako.ungzip(raw):new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());comp='GZIP protobuf'}const T=await types();let legacy=true;try{legacy=T.detector.decode(p).isLegacy!==false}catch{}let data;if(legacy){try{data=plain(T.legacy,T.legacy.decode(p))}catch{data=plain(T.current,T.current.decode(p));legacy=false}}else{try{data=plain(T.current,T.current.decode(p))}catch{data=plain(T.legacy,T.legacy.decode(p));legacy=true}}return {data:normalize(data),format:`Anikku ${legacy?'legacy':'current'} · ${comp}`}}
 function normalize(x){x=x||{};x.backupManga=A(x.backupManga);x.backupCategories=A(x.backupCategories);x.backupSources=A(x.backupSources);x.backupSavedSearches=A(x.backupSavedSearches);x.backupFeeds=A(x.backupFeeds);x.backupManga.forEach(m=>{m.episodes=A(m.episodes);m.categories=A(m.categories).map(S);m.tracking=A(m.tracking);m.history=A(m.history);m.genre=A(m.genre);m.customGenre=A(m.customGenre)});return x}
 function indexes(){state.sourceMap=new Map(A(state.data?.backupSources).map(s=>[S(s.sourceId),s.name||`Source ${s.sourceId}`]));state.catMap=new Map();A(state.data?.backupCategories).forEach((c,i)=>state.catMap.set(S(c.order??i),c))}
-function updateVersion(){const h=[...$$('.eyebrow')].find(e=>/KIRIN ANIKKU BACKUP VIEWER/i.test(e.textContent));if(h)h.textContent='KIRIN ANIKKU BACKUP VIEWER · v0.3.0 WATCH & BACKUP INTELLIGENCE';const f=[...$$('footer span')].find(e=>/GPL-2\.0/.test(e.textContent));if(f)f.textContent='v0.3.0 · Watch & Backup Intelligence · client-side · GPL-2.0'}
+function updateVersion(){const h=[...$$('.eyebrow')].find(e=>/KIRIN ANIKKU BACKUP VIEWER/i.test(e.textContent));if(h)h.textContent='KIRIN ANIKKU BACKUP VIEWER · v0.3.2 WATCH & BACKUP INTELLIGENCE';const f=[...$$('footer span')].find(e=>/GPL-2\.0/.test(e.textContent));if(f)f.textContent='v0.3.2 · Watch & Backup Intelligence · client-side · GPL-2.0'}
 function mount(){if($('#kvx-launch'))return;updateVersion();saveSettings();const host=$('.top-actions')||document.body,b=document.createElement('button');b.id='kvx-launch';b.className='icon-btn kvx-suite-launch';b.title='Watch & Backup Intelligence · Ctrl+Shift+K';b.innerHTML='◆<span id="kvx-launch-badge" class="kvx-suite-badge kvx-hidden">0</span>';host.insertBefore(b,host.firstChild);b.onclick=()=>openSuite();document.body.insertAdjacentHTML('beforeend',`<div id="kvx-suite" class="kvx-overlay kvx-hidden"><div class="kvx-backdrop" data-kvx-close></div><section class="kvx-window"><header class="kvx-head"><span class="kvx-mark">A</span><span class="kvx-head-copy"><strong>Watch & Backup Intelligence</strong><small id="kvx-subtitle">Load an Anikku backup to unlock the suite</small></span><span class="kvx-head-actions"><button class="kvx-btn" id="kvx-snapshot">Snapshot</button><button class="kvx-btn" id="kvx-undo">Undo</button><button class="kvx-icon-btn" data-kvx-close>×</button></span></header><nav class="kvx-tabs">${[['watch','Watch Center'],['episodes','Episodes'],['seasons','Seasons'],['covers','Covers'],['tracking','Tracker Center'],['sources','Source Health'],['collections','Collections'],['lab','Backup Lab'],['settings','Settings']].map(([k,n])=>`<button class="kvx-tab" data-kvx-tab="${k}">${n}</button>`).join('')}</nav><main id="kvx-body" class="kvx-body"></main></section></div><div id="kvx-preview" class="kvx-preview kvx-hidden"></div>`);$('#kvx-suite').addEventListener('click',suiteClick);$$('[data-kvx-close]').forEach(x=>x.onclick=closeSuite);$('#kvx-snapshot').onclick=()=>{snapshot(true);render()};$('#kvx-undo').onclick=undoLast;document.addEventListener('keydown',keys);document.addEventListener('contextmenu',previewFromCard,true);wire();observeLibrary()}
 function openSuite(tab=state.tab){state.tab=tab;$('#kvx-suite').classList.remove('kvx-hidden');render()}function closeSuite(){$('#kvx-suite')?.classList.add('kvx-hidden')}
 function suiteClick(e){const t=e.target.closest('[data-kvx-tab]');if(t){state.tab=t.dataset.kvxTab;return render()}const a=e.target.closest('[data-kvx-action]');if(a)return action(a.dataset.kvxAction,a);const s=e.target.closest('[data-kvx-select]');if(s){s.checked?state.selected.add(s.dataset.kvxSelect):state.selected.delete(s.dataset.kvxSelect);renderSelection()};const c=e.target.closest('[data-kvx-cover]');if(c)coverAction(c.dataset.kvxCover,c.dataset.key)}
@@ -81,6 +81,109 @@ function resetWorking(){if(!confirm('Reset v0.3 working copy to the originally l
 async function action(a,el){if(a==='smart')return smartSelect(el.dataset.smart);if(a==='scan-400')return scanCovers(false);if(a==='scan-all')return scanCovers(true);if(a==='snapshot'){snapshot(true);return renderLab()}if(a==='undo')return undoLast();if(a==='compare'){const i=document.createElement('input');i.type='file';i.onchange=()=>i.files?.[0]&&compareFile(i.files[0]);return i.click()}if(a==='new-collection'){const n=prompt('Collection name');if(n?.trim()){state.collections[n.trim()]=state.collections[n.trim()]||[];SV('collections',state.collections);renderCollections()}return}if(a==='pin-selected')return pinSelected();if(a==='collection-selected')return collectionSelected();if(a==='delete-selected')return deleteSelected();if(a==='export-selected-json')return download('anikku-selected-v030.json',JSON.stringify(selectedAnime(),null,2));if(a==='repair-safe')return repairSafe();if(a==='resolve-dupes')return resolveDupes();if(a==='reset-working')return resetWorking();if(a==='export-working-json')return download(`${(state.file?.name||'anikku').replace(/\.[^.]+$/,'')}-v030-working.json`,JSON.stringify(state.data,null,2));if(a==='export-cover-overrides')return download('anikku-cover-overrides-v030.json',JSON.stringify(state.coverOverrides,null,2));if(a==='import-cover-overrides')return importJson(x=>{state.coverOverrides=x||{};SV('covers',state.coverOverrides);state.cover.clear();renderCovers();repairDomCovers()});if(a==='export-suite-data')return download('anikku-v030-viewer-data.json',JSON.stringify({version:VERSION,pins:[...state.pins],collections:state.collections,covers:state.coverOverrides,snapshots:state.snapshots,settings:state.settings},null,2));if(a==='import-suite-data')return importJson(x=>{state.pins=new Set(A(x.pins));state.collections=x.collections||{};state.coverOverrides=x.covers||{};state.snapshots=A(x.snapshots);state.settings={...state.settings,...(x.settings||{})};SV('pins',[...state.pins]);SV('collections',state.collections);SV('covers',state.coverOverrides);SV('snapshots',state.snapshots);saveSettings();render()});if(a==='clear-suite-data'){if(confirm('Clear local v0.3 pins, collections, cover overrides and snapshots?')){['pins','collections','covers','snapshots','settings'].forEach(k=>localStorage.removeItem(`${STORE}:${k}`));state.pins.clear();state.collections={};state.coverOverrides={};state.snapshots=[];state.cover.clear();render();toast('Local suite data cleared')}}}
 function previewFromCard(e){const card=e.target.closest('#anime-grid > *');if(!card||!state.data)return;const tx=card.querySelector('strong,h3,.anime-title,.card-title,.title')?.textContent,m=A(state.data.backupManga).find(x=>norm(title(x))===norm(tx));if(!m)return;e.preventDefault();showPreview(m)}
 function showPreview(m){const p=$('#kvx-preview'),k=key(m);p.innerHTML=`<div class="kvx-preview-head"><span><small style="color:var(--kvx-muted)">QUICK PREVIEW</small><h3>${esc(title(m))}</h3></span><button class="kvx-icon-btn" id="kvx-preview-close">×</button></div><p>${esc(source(m))} · Season ${esc(m.seasonNumber??'—')}</p><p>${seen(m)}/${A(m.episodes).length} seen · ${unseen(m)} unseen · ${partial(m).length} watching · ${A(m.tracking).length} trackers</p><div class="kvx-preview-actions"><button class="kvx-btn" id="kvx-preview-pin">${state.pins.has(k)?'Unpin':'Pin'}</button><button class="kvx-btn" id="kvx-preview-cover">Cover</button><button class="kvx-btn primary" id="kvx-preview-suite">Watch Center</button></div>`;p.classList.remove('kvx-hidden');$('#kvx-preview-close').onclick=()=>p.classList.add('kvx-hidden');$('#kvx-preview-pin').onclick=()=>{state.pins.has(k)?state.pins.delete(k):state.pins.add(k);SV('pins',[...state.pins]);p.classList.add('kvx-hidden');toast('Pin updated')};$('#kvx-preview-cover').onclick=()=>{openSuite('covers');setTimeout(()=>{const q=$('#kvx-cover-search');if(q){q.value=title(m);q.dispatchEvent(new Event('input'))}},30);p.classList.add('kvx-hidden')};$('#kvx-preview-suite').onclick=()=>{openSuite('watch');p.classList.add('kvx-hidden')}}
-function boot(){mount();setTimeout(()=>{wire();observeLibrary();repairDomCovers();updateVersion()},700);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(mount,0))}
+
+/* v0.3.2 — bottom UI parity with Komikku */
+let kvxBottomUiObserver=null;
+let kvxScrollRaf=0;
+
+function kvxPagerInfo(){
+  const meta=$('#library-meta');
+  const match=S(meta?.textContent).match(/page\s+(\d+)\s*\/\s*(\d+)/i);
+  if(match)return {page:Math.max(1,N(match[1])),pages:Math.max(1,N(match[2]))};
+
+  const active=$('#pager button.active');
+  const nums=$$('#pager [data-page]').map(b=>N(b.dataset.page)).filter(Boolean);
+  return {
+    page:Math.max(1,N(active?.dataset.page)||1),
+    pages:Math.max(1,...nums,1)
+  };
+}
+
+function kvxSyncPager(){
+  const pager=$('#pager');
+  if(!pager)return;
+  const {page,pages}=kvxPagerInfo();
+
+  if(
+    pager.dataset.kvxPage===String(page) &&
+    pager.dataset.kvxPages===String(pages) &&
+    pager.querySelector('.kvx-page-label')
+  ) return;
+
+  pager.dataset.kvxPage=String(page);
+  pager.dataset.kvxPages=String(pages);
+  pager.classList.add('kvx-komikku-pager');
+  pager.innerHTML=`
+    <button type="button" class="kvx-pager-nav" data-page="${Math.max(1,page-1)}" ${page<=1?'disabled':''}>Previous</button>
+    <span class="kvx-page-label">Page ${page} / ${pages}</span>
+    <button type="button" class="kvx-pager-nav" data-page="${Math.min(pages,page+1)}" ${page>=pages?'disabled':''}>Next</button>
+  `;
+}
+
+function kvxUpdateScrollButtons(){
+  const up=$('#scroll-top'),down=$('#scroll-bottom');
+  if(!up||!down)return;
+
+  const root=document.documentElement;
+  const body=document.body;
+  const y=Math.max(0,window.scrollY||root.scrollTop||body?.scrollTop||0);
+  const height=Math.max(
+    root.scrollHeight,root.offsetHeight,root.clientHeight,
+    body?.scrollHeight||0,body?.offsetHeight||0
+  );
+  const max=Math.max(0,height-window.innerHeight);
+  const atTop=y<=2;
+  const atBottom=max<=2 || y>=max-2;
+
+  up.disabled=atTop;
+  down.disabled=atBottom;
+  up.classList.toggle('kvx-scroll-disabled',atTop);
+  down.classList.toggle('kvx-scroll-disabled',atBottom);
+  up.setAttribute('aria-disabled',String(atTop));
+  down.setAttribute('aria-disabled',String(atBottom));
+}
+
+function kvxQueueBottomUi(){
+  if(kvxScrollRaf)return;
+  kvxScrollRaf=requestAnimationFrame(()=>{
+    kvxScrollRaf=0;
+    kvxSyncPager();
+    kvxUpdateScrollButtons();
+  });
+}
+
+function kvxInitBottomUi(){
+  kvxSyncPager();
+  kvxUpdateScrollButtons();
+
+  window.addEventListener('scroll',kvxQueueBottomUi,{passive:true});
+  window.addEventListener('resize',kvxQueueBottomUi,{passive:true});
+
+  const pager=$('#pager');
+  if(pager && 'MutationObserver' in window){
+    kvxBottomUiObserver=new MutationObserver(()=>setTimeout(kvxQueueBottomUi,0));
+    kvxBottomUiObserver.observe(pager,{childList:true,subtree:true});
+  }
+
+  if('ResizeObserver' in window){
+    const ro=new ResizeObserver(kvxQueueBottomUi);
+    ro.observe(document.documentElement);
+    if(document.body)ro.observe(document.body);
+  }
+
+  /* Re-check after base app renders a new page/filter/backup. */
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#pager,[data-view],.quick-filter,#recent-library,#page-size,.filterbar')) {
+      setTimeout(kvxQueueBottomUi,35);
+      setTimeout(kvxQueueBottomUi,180);
+    }
+  },true);
+
+  setTimeout(kvxQueueBottomUi,100);
+  setTimeout(kvxQueueBottomUi,700);
+  setTimeout(kvxQueueBottomUi,1600);
+}
+
+function boot(){mount();kvxInitBottomUi();setTimeout(()=>{wire();observeLibrary();repairDomCovers();updateVersion();kvxQueueBottomUi()},700);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(mount,0))}
 boot();
 })();

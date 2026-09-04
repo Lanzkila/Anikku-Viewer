@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2] - 2026-09-05
+
+### Fixed
+- Reworked the Anikku Library pager to match Komikku: `Previous · Page X / Y · Next`.
+- Fixed the bottom-of-page state so the `↓` button becomes dark/disabled when the footer is reached.
+- Fixed the top-of-page state so the `↑` button becomes dark/disabled at the top.
+- Scroll-button state now refreshes after pagination, filters, dynamic rendering, resize and document-height changes.
+- Increased the bottom spacing around the pager/footer so the whole lower section matches Komikku more closely.
+- Fixed the visible build label/footer to v0.3.2.
+- Changed the injected suite fetch to network-first to reduce stale service-worker add-on caching.
+- Updated service-worker cache to `kirin-anikku-v032`.
+
 ## [0.3.1] - 2026-09-05
 
 ### Fixed
