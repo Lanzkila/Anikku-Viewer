@@ -1,5 +1,13 @@
 # Changelog
 
+## Recent commits (automatic)
+
+<!-- AUTO-CHANGELOG:START -->
+### 2026-10-08 (MYT)
+- **08:49** · **CI** — ci: add auto changelog workflow for main commits ([`cd697ba`](https://github.com/Lanzkila/Anikku-Viewer/commit/cd697baf46533d639c648f7af674a52e17f29e12)) <!-- commit:cd697baf46533d639c648f7af674a52e17f29e12 -->
+<!-- AUTO-CHANGELOG:END -->
+
+
 ## [0.3.2] - 2026-09-05
 
 ### Fixed
