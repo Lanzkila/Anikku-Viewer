@@ -92,6 +92,10 @@ Setiap push yang relevan ke branch `main` akan mencetuskan **[Auto Changelog](.g
 - Workflow boleh dijalankan manual melalui **Actions → Auto Changelog → Run workflow** (menyegerakkan commit sehingga 30 hari lalu).
 - Commit bot tidak mencetuskan kemas kini berulang. Rekod lama tidak dibuang secara automatik.
 
+## 🧹 Auto Library Cleanup
+
+Apabila backup baharu dibuka, viewer secara automatik **menyembunyikan anime yang ditandakan `favorite=false`** (bukan lagi dalam Library). Rekod sejarah yang disimpan oleh aplikasi asal tidak lagi bercampur dalam Dashboard, Library dan Intelligence Suite. **Fail `.tachibk` asal tidak diubah.** Eksport JSON daripada viewer mengandungi data Library yang telah ditapis. Untuk mengetahui perubahan terkini daripada aplikasi, buat dan buka backup baharu; GitHub Pages tidak menyambung terus ke pangkalan data aplikasi.
+
 ## 🇬🇧 English overview
 
 This is a **client-side Anikku backup metadata viewer**, not a streaming/downloading app. It supports compatible current/legacy backup formats, library and watch-progress inspection, episode/season/tracker tools, local backup intelligence and cover recovery. Open the **[live web app](https://lanzkila.github.io/Anikku-Viewer/)**, choose a compatible backup file, and inspect or export decoded JSON. Original `.tachibk` re-encoding is intentionally unavailable. Automated commit history is maintained in [CHANGELOG.md](CHANGELOG.md).

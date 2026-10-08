@@ -233,8 +233,12 @@
 
   function normalizeBackup(input) {
     const d = input?.data && input.data.backupManga ? input.data : input;
+    const allEntries = arr(d?.backupManga);
+    const hiddenNonLibrary = allEntries.filter(m=>m.favorite === false).length;
     const out = {
-      backupManga:arr(d?.backupManga).map(m=>({
+      // A missing 'favorite' field is true by Kotlin's backup default.
+      // Explicit false marks a former/non-library entry, often kept for history.
+      backupManga:allEntries.filter(m=>m.favorite !== false).map(m=>({
         ...m,
         source:key64(m.source),
         episodes:arr(m.episodes).map(ep=>({
@@ -274,6 +278,7 @@
       })),
       __format:d?.__format || input?.__format || '',
     };
+    Object.defineProperty(out, '_autoCleanHidden', {value:hiddenNonLibrary, configurable:true});
     return out;
   }
 
@@ -710,7 +715,7 @@
       renderDashboard();
       renderMetadata();
       $('#backup-name').textContent=file.name;
-      $('#backup-summary').textContent=`${arr(state.data.backupManga).length.toLocaleString()} anime · ${arr(state.data.backupCategories).length} categories · ${arr(state.data.backupSources).length} sources`;
+      $('#backup-summary').textContent=`${arr(state.data.backupManga).length.toLocaleString()} anime · ${arr(state.data.backupCategories).length} categories · ${arr(state.data.backupSources).length} sources${state.data._autoCleanHidden ? ` · ${state.data._autoCleanHidden.toLocaleString()} bukan Library disembunyikan` : ''}`;
       $('#format-badge').textContent=state.format.includes('legacy')?'LEGACY':'CURRENT';
       $('#home-view').classList.add('hidden');
       $('#app-view').classList.remove('hidden');
