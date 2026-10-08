@@ -1,6 +1,6 @@
-const CACHE='kirin-anikku-v032';
+const CACHE='kirin-anikku-v033';
 const BASE_JS='./assets/js/app.js?v=021';
-const BASE_CSS='./assets/css/app.css?v=021';
+const BASE_CSS='./assets/css/app.css?v=033';
 const SUITE_JS='./assets/js/suite-v030.js';
 const SUITE_CSS='./assets/css/suite-v030.css';
 const SHELL=['./','./index.html',BASE_JS,BASE_CSS,SUITE_JS,SUITE_CSS,'./assets/vendor/pako.min.js','./assets/icons/app-icon.svg','./schemas/schema-anikku.proto','./manifest.webmanifest?v=021'];
