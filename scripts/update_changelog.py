@@ -2,7 +2,7 @@
 """Maintain an append-only, deduplicated Git commit history inside CHANGELOG.md.
 
 The human-written version notes outside the markers are never modified.
-On push: include every commit from the push range.
+On push: include every commit from the push range plus recent commits missed before setup.
 On workflow_dispatch: backfill commits from the last LOOKBACK_DAYS days (default 30).
 """
 
@@ -49,6 +49,8 @@ def git(*args: str) -> str:
 def target_commits() -> list[str]:
     name = os.environ.get("GITHUB_EVENT_NAME", "")
     event_file = os.environ.get("GITHUB_EVENT_PATH", "")
+    days = max(1, min(int(os.environ.get("LOOKBACK_DAYS", "30")), 365))
+    recent = git("log", f"--since={days}.days", "--format=%H", "--no-merges", "HEAD").splitlines()
     if name == "push" and event_file and Path(event_file).is_file():
         event = json.loads(Path(event_file).read_text(encoding="utf-8"))
         before, after = event.get("before", ""), event.get("after", "")
@@ -56,12 +58,12 @@ def target_commits() -> list[str]:
             return []  # Branch deletion.
         if SHA_PATTERN.fullmatch(before) and before != "0" * 40 and SHA_PATTERN.fullmatch(after):
             try:
-                return git("rev-list", "--reverse", "--no-merges", f"{before}..{after}").splitlines()
+                pushed = git("rev-list", "--reverse", "--no-merges", f"{before}..{after}").splitlines()
+                return list(dict.fromkeys([*pushed, *recent]))
             except subprocess.CalledProcessError:
                 print("Push's previous ref is unavailable: falling back to 30-day history.")
 
-    days = max(1, min(int(os.environ.get("LOOKBACK_DAYS", "30")), 365))
-    return git("log", f"--since={days}.days", "--format=%H", "--no-merges", "HEAD").splitlines()
+    return recent
 
 
 def kind(subject: str) -> str:
