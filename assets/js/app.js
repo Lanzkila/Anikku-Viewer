@@ -35,7 +35,7 @@
     categoryMap:new Map(),
     filtered:[],
     page:1,
-    pageSize:24,
+    pageSize:28,
     quickFilter:'all',
     libraryLayout:'grid',
     currentView:'dashboard',
@@ -709,7 +709,7 @@
       state.page=1;
       state.quickFilter='all';
       setQuickFilter('all',false);
-      state.pageSize=num($('#page-size').value)||24;
+      state.pageSize=num($('#page-size').value)||28;
       state.filtered=arr(state.data.backupManga).map((m,index)=>({m,index}));
       showLoading('Building dashboard…',90);
       renderDashboard();
@@ -786,7 +786,7 @@
     $('#layout-grid').addEventListener('click',()=>setLibraryLayout('grid'));
     $('#layout-compact').addEventListener('click',()=>setLibraryLayout('compact'));
     $('#recent-library').addEventListener('click',showRecentlyWatched);
-    $('#page-size').addEventListener('change',()=>{state.pageSize=num($('#page-size').value)||24;state.page=1;renderLibrary();});
+    $('#page-size').addEventListener('change',()=>{state.pageSize=num($('#page-size').value)||28;state.page=1;renderLibrary();});
     $('#pager').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=num(b.dataset.page)||1;renderLibrary();window.scrollTo({top:150,behavior:'smooth'});});
     $('#anime-grid').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
     $('#continue-watching').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
@@ -799,7 +799,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=035',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=036',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
