@@ -524,7 +524,7 @@
     state.page=clamp(state.page,1,pages);
     const start=(state.page-1)*state.pageSize;
     const slice=state.filtered.slice(start,start+state.pageSize);
-    $('#library-meta').textContent = `${total.toLocaleString()} of ${arr(state.data.backupManga).length.toLocaleString()} anime · page ${state.page}/${pages}`;
+    $('#library-meta').textContent = `${total.toLocaleString()} of ${arr(state.data.backupManga).length.toLocaleString()} anime · page ${state.page}/${pages}${state.data._autoCleanHidden ? ` · ${state.data._autoCleanHidden.toLocaleString()} bukan Library disembunyikan` : ''}`;
 
     $('#anime-grid').innerHTML = slice.map(({m,index})=>{
       const eps=arr(m.episodes),seen=seenCount(m),unseen=unseenCount(m),cover=animeCover(m);
@@ -799,7 +799,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=021',{updateViaCache:'none'}).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=035',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
