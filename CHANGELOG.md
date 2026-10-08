@@ -4,7 +4,14 @@
 
 <!-- AUTO-CHANGELOG:START -->
 ### 2026-10-08 (MYT)
+- **08:50** · **Fixed** — fix(changelog): backfill 30-day history on every push without duplicates ([`4413f21`](https://github.com/Lanzkila/Anikku-Viewer/commit/4413f21c458698678680645eac3117b7d5d8bc60)) <!-- commit:4413f21c458698678680645eac3117b7d5d8bc60 -->
 - **08:49** · **CI** — ci: add auto changelog workflow for main commits ([`cd697ba`](https://github.com/Lanzkila/Anikku-Viewer/commit/cd697baf46533d639c648f7af674a52e17f29e12)) <!-- commit:cd697baf46533d639c648f7af674a52e17f29e12 -->
+- **08:49** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`958d31c`](https://github.com/Lanzkila/Anikku-Viewer/commit/958d31cefd52805a540baa8f2448a80a10a4eb4f)) <!-- commit:958d31cefd52805a540baa8f2448a80a10a4eb4f -->
+- **08:48** · **Docs** — docs: rework Anikku Viewer README with features, badges, guides and changelog info ([`93bf6da`](https://github.com/Lanzkila/Anikku-Viewer/commit/93bf6dafd47086ec8895ea785fdb8cc1e21bb68a)) <!-- commit:93bf6dafd47086ec8895ea785fdb8cc1e21bb68a -->
+- **08:48** · **Maintenance** — chore: add deduplicating timestamped changelog generator ([`600824e`](https://github.com/Lanzkila/Anikku-Viewer/commit/600824e597ca8466aa5211e8cbf4900e1e7141a4)) <!-- commit:600824e597ca8466aa5211e8cbf4900e1e7141a4 -->
+- **08:45** · **Fixed** — fix(pages): load updated responsive header stylesheet ([`7e0983b`](https://github.com/Lanzkila/Anikku-Viewer/commit/7e0983b680f13decefbf0f1791d847b6fdbee04a)) <!-- commit:7e0983b680f13decefbf0f1791d847b6fdbee04a -->
+- **08:45** · **Fixed** — fix(pwa): refresh stylesheet cache for mobile header ([`4a6df10`](https://github.com/Lanzkila/Anikku-Viewer/commit/4a6df10c6cb4135fef746af8c241ab09da62492d)) <!-- commit:4a6df10c6cb4135fef746af8c241ab09da62492d -->
+- **08:45** · **Fixed** — fix(mobile): align header action buttons to the right ([`28f8de8`](https://github.com/Lanzkila/Anikku-Viewer/commit/28f8de86cf4333fa6a3459c1bee3dae8eef8fa47)) <!-- commit:28f8de86cf4333fa6a3459c1bee3dae8eef8fa47 -->
 <!-- AUTO-CHANGELOG:END -->
 
 
