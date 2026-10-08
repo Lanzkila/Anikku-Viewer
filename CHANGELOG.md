@@ -4,7 +4,9 @@
 
 <!-- AUTO-CHANGELOG:START -->
 ### 2026-10-08 (MYT)
+- **10:01** · **Fixed** — fix(library): fill desktop 7-column grid with 28 anime per page ([`c06c754`](https://github.com/Lanzkila/Anikku-Viewer/commit/c06c75422bbb8062a4470f7bf2542b86ebbb6a7e)) <!-- commit:c06c75422bbb8062a4470f7bf2542b86ebbb6a7e -->
 - **09:32** · **Fixed** — fix(pwa): refresh Anikku cleanup script and show hidden Library count ([`b784e27`](https://github.com/Lanzkila/Anikku-Viewer/commit/b784e27aa7e4b40fab63f2f81c642a4cc7809003)) <!-- commit:b784e27aa7e4b40fab63f2f81c642a4cc7809003 -->
+- **09:32** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`3e657a1`](https://github.com/Lanzkila/Anikku-Viewer/commit/3e657a123a0f6cd5992640aa41b420d8a062b217)) <!-- commit:3e657a123a0f6cd5992640aa41b420d8a062b217 -->
 - **09:21** · **Fixed** — fix(viewer): automatically exclude non-library Anikku backup entries ([`8c42fd1`](https://github.com/Lanzkila/Anikku-Viewer/commit/8c42fd1de6507e930a08d2a9b53cffbb8679ab95)) <!-- commit:8c42fd1de6507e930a08d2a9b53cffbb8679ab95 -->
 - **09:21** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`30d5942`](https://github.com/Lanzkila/Anikku-Viewer/commit/30d5942fcfbf156f162bb6a439c96b1be0dbaa25)) <!-- commit:30d5942fcfbf156f162bb6a439c96b1be0dbaa25 -->
 - **08:50** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`83b8e3b`](https://github.com/Lanzkila/Anikku-Viewer/commit/83b8e3bc9b6739f8d8a39cb35fce568d9eadad89)) <!-- commit:83b8e3bc9b6739f8d8a39cb35fce568d9eadad89 -->
