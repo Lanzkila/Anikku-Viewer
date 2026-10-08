@@ -124,16 +124,11 @@ function kvxUpdateScrollButtons(){
   const up=$('#scroll-top'),down=$('#scroll-bottom');
   if(!up||!down)return;
 
-  const root=document.documentElement;
-  const body=document.body;
-  const y=Math.max(0,window.scrollY||root.scrollTop||body?.scrollTop||0);
-  const height=Math.max(
-    root.scrollHeight,root.offsetHeight,root.clientHeight,
-    body?.scrollHeight||0,body?.offsetHeight||0
-  );
-  const max=Math.max(0,height-window.innerHeight);
-  const atTop=y<=2;
-  const atBottom=max<=2 || y>=max-2;
+  const root=document.scrollingElement||document.documentElement;
+  const y=Math.max(0,root.scrollTop||window.scrollY||0);
+  const max=Math.max(0,root.scrollHeight-(root.clientHeight||window.innerHeight));
+  const atTop=y<=3;
+  const atBottom=max<=3 || y>=max-3;
 
   up.disabled=atTop;
   down.disabled=atBottom;

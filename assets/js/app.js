@@ -551,6 +551,7 @@
     pageButtons.push(`<button data-page="${Math.min(pages,state.page+1)}">›</button>`);
     $('#pager').innerHTML=pageButtons.join('');
     applyLibraryLayout(false);
+    requestAnimationFrame(updateScrollBoundaryButtons);
   }
 
   function renderExplore(tab=state.exploreTab) {
@@ -794,12 +795,32 @@
     $$('[data-explore-jump]').forEach(b=>b.addEventListener('click',()=>{switchView('explore');renderExplore(b.dataset.exploreJump);}));
     $('#scroll-top').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
     $('#scroll-bottom').addEventListener('click',()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'}));
+    window.addEventListener('scroll',updateScrollBoundaryButtons,{passive:true});
+    window.addEventListener('resize',updateScrollBoundaryButtons,{passive:true});
+    if ('ResizeObserver' in window) {
+      const boundaryObserver=new ResizeObserver(()=>requestAnimationFrame(updateScrollBoundaryButtons));
+      boundaryObserver.observe(document.body);
+    }
+    requestAnimationFrame(updateScrollBoundaryButtons);
     window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTheme();$('#main-nav').classList.remove('open');}});
+  }
+
+  function updateScrollBoundaryButtons() {
+    const up=$('#scroll-top'),down=$('#scroll-bottom');
+    if (!up || !down) return;
+    const root=document.scrollingElement||document.documentElement;
+    const max=Math.max(0,root.scrollHeight-(root.clientHeight||window.innerHeight));
+    const y=Math.max(0,root.scrollTop||window.scrollY||0);
+    const atTop=y<=3,atBottom=max<=3||y>=max-3;
+    up.disabled=atTop;
+    down.disabled=atBottom;
+    up.setAttribute('aria-disabled',String(atTop));
+    down.setAttribute('aria-disabled',String(atBottom));
   }
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=036',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=037',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 

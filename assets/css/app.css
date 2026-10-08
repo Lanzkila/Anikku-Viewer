@@ -866,3 +866,16 @@ footer{
     height: 36px;
   }
 }
+
+/* v037: grey out fixed scroll arrows exactly at page boundaries. */
+.scroll-controls button:disabled,
+.scroll-controls button[aria-disabled="true"]{
+  color:var(--muted)!important;
+  background:color-mix(in srgb,var(--surface) 55%,var(--bg))!important;
+  border-color:color-mix(in srgb,var(--line) 68%,var(--bg))!important;
+  opacity:.38!important;
+  box-shadow:none!important;
+  cursor:default!important;
+  pointer-events:none!important;
+  transform:none!important;
+}
