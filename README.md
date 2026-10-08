@@ -1,41 +1,103 @@
+<div align="center">
+
+<img src="assets/icons/app-icon.svg" alt="Kirin Anikku Viewer" width="94" height="94">
+
 # Kirin Anikku Backup Viewer
 
-Client-side **Anikku** backup viewer focused on anime/video metadata, episodes, watch progress, seasons, tracking and backup analysis. Viewer only; it does not stream or download episodes.
+**Anikku backup explorer · Library insights · Watch progress**
 
-## Current build
+Buka, semak dan urus metadata backup anime Anikku terus di browser — tanpa muat naik backup ke server khas.
 
-**v0.3.0 — Watch & Backup Intelligence**
+*Explore and inspect your Anikku anime backups locally in your browser.*
 
-Repository: `Lanzkila/Anikku-Viewer`
+[**🌐 Buka Viewer / Open Viewer**](https://lanzkila.github.io/Anikku-Viewer/) · [**📋 Changelog**](CHANGELOG.md) · [**📄 License**](LICENSE)
 
-## Main features
+[![Stars](https://img.shields.io/github/stars/Lanzkila/Anikku-Viewer?style=flat-square&logo=github&label=Stars)](https://github.com/Lanzkila/Anikku-Viewer/stargazers)
+[![Forks](https://img.shields.io/github/forks/Lanzkila/Anikku-Viewer?style=flat-square&logo=github&label=Forks)](https://github.com/Lanzkila/Anikku-Viewer/forks)
+[![License](https://img.shields.io/github/license/Lanzkila/Anikku-Viewer?style=flat-square)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/Lanzkila/Anikku-Viewer?style=flat-square)](https://github.com/Lanzkila/Anikku-Viewer/commits/main/)
+[![Auto changelog](https://github.com/Lanzkila/Anikku-Viewer/actions/workflows/auto-changelog.yml/badge.svg?branch=main)](https://github.com/Lanzkila/Anikku-Viewer/actions/workflows/auto-changelog.yml)
 
-- Current + legacy Anikku root detection
-- `.tachibk`, GZIP/raw protobuf and JSON input
-- Dashboard, Library, Explore, Tools, seven themes and responsive mobile/desktop UI
-- Watch Center: premium Continue Watching, watch history, watch analytics, streak and 52-week heatmap
-- Episode Center: Seen/Unseen/Watching/Filler/Bookmark/Invalid-progress filters and sorting
-- Season Explorer and parent/child relationship view with broken-parent detection
-- Tracker Center for MyAnimeList, AniList, Kitsu, Shikimori, Bangumi, Simkl and Jellyfin
-- Source Health plus Feed/Saved Search inspection
-- Local pins, custom collections, bulk selection and in-memory delete
-- Snapshot Vault, two-backup compare, duplicate resolution, Repair Center, integrity grade, Undo/reset and change-session log
-- Quick Preview and keyboard library navigation
-- **Cover Recovery Center** with custom poster → poster → background fallback, URL normalization/retry, missing/broken detection, local URL/image override and override export/import
-- Watch-position unit normalization is retained for backups that store x1000 millisecond-like values
+</div>
 
-## Export safety
+---
 
-Decoded/working JSON export is available. `.tachibk` re-encoding is intentionally still disabled until the Anikku preservation schema covers every field that must survive a round trip.
+## 🇲🇾 Tentang projek
 
-## Privacy
+**Kirin Anikku Backup Viewer** ialah viewer web / PWA untuk membaca metadata daripada backup **Anikku**. Ia bertujuan membantu kau menyemak perpustakaan anime, episod, status tontonan, tracker dan masalah metadata tanpa membuka aplikasi asal.
 
-Backup decoding stays in the browser. Pins, collections, snapshots and cover overrides are local viewer data.
+> **Viewer sahaja.** Ia **tidak** memainkan atau memuat turun episod. Fail backup asal tidak diubah, dan eksport kembali ke format `.tachibk` masih **belum disokong**.
 
-## PWA / update note
+**Versi ciri terbaru yang direkodkan:** `v0.3.2` (Watch & Backup Intelligence + penambahbaikan navigasi/scroll). Enjin asal `v0.2.1` masih dikekalkan; suite tambahan dimuat melalui service worker.
 
-v0.3.0 is loaded as an additive suite by the updated service worker so the stable v0.2.1 core files remain untouched. After replacing the patch files on GitHub Pages, refresh once after the new service worker activates.
+## ✨ Ciri utama / Features
 
-## License
+| Modul | Fungsi |
+| --- | --- |
+| **Backup Reader** | Kesan struktur Anikku semasa dan legacy; baca `.tachibk`, GZIP/raw protobuf dan JSON yang serasi |
+| **Dashboard & Library** | Ringkasan koleksi, carian, penapis, sort, grid/compact view, pagination |
+| **Watch Center** | Continue Watching, sejarah tontonan, analitik, streak dan heatmap 52 minggu |
+| **Episode Center** | Semak Seen, Unseen, Watching, Filler, Bookmark dan invalid progress |
+| **Season Explorer** | Hubungan parent/child, susunan musim dan pengesanan pautan parent rosak |
+| **Tracker Center** | Metadata MyAnimeList, AniList, Kitsu, Shikimori, Bangumi, Simkl dan Jellyfin |
+| **Metadata Tools** | Source Health, Feed / Saved Search, Quick Preview dan navigasi papan kekunci |
+| **Library Tools** | Pins tempatan, custom collections, bulk selection dan pemadaman dalam memori |
+| **Backup Intelligence** | Snapshot Vault, perbandingan dua backup, duplicate resolution, Repair Center, integrity grade dan Undo/reset |
+| **Cover Recovery** | Fallback poster/background, pemeriksaan imej rosak, URL retry, local override serta import/eksport override |
+| **Penampilan** | 7 tema, layout responsif untuk HP/desktop, kawalan scroll dan PWA |
 
-GPL-2.0.
+## 🚀 Cara guna / Quick start
+
+1. Buka **[Kirin Anikku Viewer](https://lanzkila.github.io/Anikku-Viewer/)** pada telefon atau desktop.
+2. Tekan **Choose file** dan pilih backup Anikku (`.tachibk`, protobuf/GZIP atau JSON yang disokong).
+3. Selepas backup diproses, guna **Dashboard**, **Library**, **Explore** dan **Tools**.
+4. Tekan **◆** untuk membuka **Watch & Backup Intelligence** (pintasan desktop: `Ctrl + Shift + K`).
+5. Jika perlu, eksport data yang telah dinyahkod dalam bentuk **JSON**.
+
+> Simpan backup asal. Viewer mengubah data kerja dalam memori / data tempatan sahaja; ia bukan alat untuk menulis semula fail backup Anikku.
+
+## 🔒 Privasi & keselamatan data
+
+- Proses decoding backup berjalan **di browser**; viewer tidak menghantar fail backup ke server milik projek.
+- Pins, collections, snapshots dan cover overrides ialah data viewer **setempat**.
+- Library luaran yang diperlukan oleh decoder boleh dimuat daripada CDN; sambungan internet mungkin diperlukan pada lawatan awal.
+- **Decoded/working JSON export** tersedia. **Re-encoding `.tachibk` sengaja dimatikan** sehingga liputan schema preservation lengkap.
+- Selepas kemas kini GitHub Pages, refresh laman supaya service worker / cache PWA menggunakan versi terkini.
+
+## 📁 Struktur repositori
+
+```text
+Anikku-Viewer/
+├── index.html                      # UI utama
+├── assets/
+│   ├── css/                        # Tema, layout & suite
+│   ├── js/                         # Decoder, viewer & suite
+│   ├── icons/                      # Ikon PWA
+│   └── vendor/                     # Dependency tempatan
+├── schemas/                        # Schema protobuf
+├── sw.js                           # Service worker & cache
+├── manifest.webmanifest            # PWA manifest
+├── scripts/update_changelog.py     # Penjana sejarah commit automatik
+├── .github/workflows/
+│   └── auto-changelog.yml          # Workflow GitHub Actions
+├── CHANGELOG.md                    # Release notes + sejarah commit
+└── LICENSE                         # GPL-2.0
+```
+
+## 📝 Auto changelog
+
+Setiap push yang relevan ke branch `main` akan mencetuskan **[Auto Changelog](.github/workflows/auto-changelog.yml)**. Workflow membaca commit baharu, merekod tarikh dan jam **MYT (UTC+8)**, mengelakkan rekod berganda, dan mengemas kini [`CHANGELOG.md`](CHANGELOG.md) melalui satu commit bot.
+
+- Rekod release/version sedia ada dikekalkan; log automatik disimpan dalam seksyen berasingan.
+- Workflow boleh dijalankan manual melalui **Actions → Auto Changelog → Run workflow** (menyegerakkan commit sehingga 30 hari lalu).
+- Commit bot tidak mencetuskan kemas kini berulang. Rekod lama tidak dibuang secara automatik.
+
+## 🇬🇧 English overview
+
+This is a **client-side Anikku backup metadata viewer**, not a streaming/downloading app. It supports compatible current/legacy backup formats, library and watch-progress inspection, episode/season/tracker tools, local backup intelligence and cover recovery. Open the **[live web app](https://lanzkila.github.io/Anikku-Viewer/)**, choose a compatible backup file, and inspect or export decoded JSON. Original `.tachibk` re-encoding is intentionally unavailable. Automated commit history is maintained in [CHANGELOG.md](CHANGELOG.md).
+
+## 📜 License
+
+Distributed under **[GPL-2.0](LICENSE)**.
+
+<div align="center"><sub>Made for the Kirin project · <a href="https://github.com/Lanzkila/Anikku-Viewer">Lanzkila / Anikku-Viewer</a></sub></div>
