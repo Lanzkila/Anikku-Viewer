@@ -814,3 +814,55 @@ footer{
     right:10px!important;
   }
 }
+
+
+/* Mobile header: keep the Kirin brand left and the three action buttons right. */
+@media (max-width: 760px) {
+  .topbar {
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+  .topbar .brand {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .topbar .brand > span:last-child {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .topbar .brand strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar .brand-mark {
+    flex-shrink: 0;
+  }
+  .topbar .top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    margin-left: auto;
+    gap: 7px;
+  }
+  .topbar .top-actions .icon-btn {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
+}
+@media (max-width: 360px) {
+  .topbar .brand { gap: 6px; }
+  .topbar .top-actions { gap: 5px; }
+  .topbar .top-actions .icon-btn {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+}
