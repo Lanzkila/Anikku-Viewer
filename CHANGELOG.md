@@ -4,6 +4,8 @@
 
 <!-- AUTO-CHANGELOG:START -->
 ### 2026-10-08 (MYT)
+- **09:21** · **Fixed** — fix(viewer): automatically exclude non-library Anikku backup entries ([`8c42fd1`](https://github.com/Lanzkila/Anikku-Viewer/commit/8c42fd1de6507e930a08d2a9b53cffbb8679ab95)) <!-- commit:8c42fd1de6507e930a08d2a9b53cffbb8679ab95 -->
+- **08:50** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`83b8e3b`](https://github.com/Lanzkila/Anikku-Viewer/commit/83b8e3bc9b6739f8d8a39cb35fce568d9eadad89)) <!-- commit:83b8e3bc9b6739f8d8a39cb35fce568d9eadad89 -->
 - **08:50** · **Fixed** — fix(changelog): backfill 30-day history on every push without duplicates ([`4413f21`](https://github.com/Lanzkila/Anikku-Viewer/commit/4413f21c458698678680645eac3117b7d5d8bc60)) <!-- commit:4413f21c458698678680645eac3117b7d5d8bc60 -->
 - **08:49** · **CI** — ci: add auto changelog workflow for main commits ([`cd697ba`](https://github.com/Lanzkila/Anikku-Viewer/commit/cd697baf46533d639c648f7af674a52e17f29e12)) <!-- commit:cd697baf46533d639c648f7af674a52e17f29e12 -->
 - **08:49** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`958d31c`](https://github.com/Lanzkila/Anikku-Viewer/commit/958d31cefd52805a540baa8f2448a80a10a4eb4f)) <!-- commit:958d31cefd52805a540baa8f2448a80a10a4eb4f -->
