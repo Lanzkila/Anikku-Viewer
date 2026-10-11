@@ -4,6 +4,8 @@
 
 <!-- AUTO-CHANGELOG:START -->
 ### 2026-10-11 (MYT)
+- **17:48** · **Fixed** — fix(images): recover broken Anikku cover thumbnails across dashboard library and detail ([`92aa792`](https://github.com/Lanzkila/Anikku-Viewer/commit/92aa792398dab91b6d7753320d3bfbec2888c7ae)) <!-- commit:92aa792398dab91b6d7753320d3bfbec2888c7ae -->
+- **17:41** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`f49d3e7`](https://github.com/Lanzkila/Anikku-Viewer/commit/f49d3e751570a874ae134c877559d2979ef582a2)) <!-- commit:f49d3e751570a874ae134c877559d2979ef582a2 -->
 - **17:41** · **Fixed** — fix(ui): make Anikku anime details compact on mobile while preserving transparent backdrop ([`4854661`](https://github.com/Lanzkila/Anikku-Viewer/commit/48546612baccae02f552545cd9707ab96ce64ec6)) <!-- commit:48546612baccae02f552545cd9707ab96ce64ec6 -->
 
 ### 2026-10-08 (MYT)
