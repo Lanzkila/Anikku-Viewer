@@ -4,6 +4,8 @@
 
 <!-- AUTO-CHANGELOG:START -->
 ### 2026-10-11 (MYT)
+- **18:16** · **Added** — feat(analyze): add Komikku-style duplicate detector to Anikku Tools ([`0655674`](https://github.com/Lanzkila/Anikku-Viewer/commit/06556748383333fb83a861de08e45c6c50bea32a)) <!-- commit:06556748383333fb83a861de08e45c6c50bea32a -->
+- **18:01** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`9f0ee4f`](https://github.com/Lanzkila/Anikku-Viewer/commit/9f0ee4ffe87815b4d2fba819d6999b26680b6f94)) <!-- commit:9f0ee4ffe87815b4d2fba819d6999b26680b6f94 -->
 - **18:01** · **Fixed** — fix(covers): prevent dead-image reinsertion and recover matching backup artwork ([`420d918`](https://github.com/Lanzkila/Anikku-Viewer/commit/420d918127ed72abd5b7a80c0eebfb389674cbff)) <!-- commit:420d918127ed72abd5b7a80c0eebfb389674cbff -->
 - **17:48** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`c6325f0`](https://github.com/Lanzkila/Anikku-Viewer/commit/c6325f0c25a027aa1d6342f76df7b5cf8a6998b0)) <!-- commit:c6325f0c25a027aa1d6342f76df7b5cf8a6998b0 -->
 - **17:48** · **Fixed** — fix(images): recover broken Anikku cover thumbnails across dashboard library and detail ([`92aa792`](https://github.com/Lanzkila/Anikku-Viewer/commit/92aa792398dab91b6d7753320d3bfbec2888c7ae)) <!-- commit:92aa792398dab91b6d7753320d3bfbec2888c7ae -->
