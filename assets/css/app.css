@@ -879,3 +879,183 @@ footer{
   pointer-events:none!important;
   transform:none!important;
 }
+
+
+/* v038: responsive Anime Info, inspired by Komikku manga details.
+   Preserve the cover/backdrop's transparency and all original anime metadata. */
+#anime-modal .modal-card{
+  width:min(1040px,96vw);
+  max-height:calc(100dvh - 24px);
+  padding:14px!important;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+}
+#anime-modal .anime-hero{
+  isolation:isolate;
+  min-height:0;
+  background:color-mix(in srgb,var(--surface2) 48%,transparent);
+}
+#anime-modal .anime-hero-bg{
+  opacity:1;
+  /* Existing blurred/dimmed cover background remains visible beneath the UI. */
+  filter:blur(3px) brightness(.40) saturate(1.15);
+}
+#anime-modal .anime-hero-content{
+  display:grid;
+  grid-template-columns:145px minmax(0,1fr);
+  gap:0 18px;
+  align-items:start;
+  padding:18px;
+  min-width:0;
+}
+#anime-modal .anime-hero-content>.detail-cover{
+  grid-column:1;
+  grid-row:1 / span 2;
+  width:145px;
+  max-width:100%;
+  height:auto;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+#anime-modal .anime-hero-heading{
+  grid-column:2;
+  grid-row:1;
+  min-width:0;
+  padding-right:38px;
+}
+#anime-modal .detail-title{
+  font-size:clamp(22px,2.6vw,29px);
+  line-height:1.18;
+  overflow-wrap:anywhere;
+  margin:6px 0 9px;
+}
+#anime-modal .anime-hero-heading .chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:10px 0 12px;
+}
+#anime-modal .anime-hero-heading .chip{
+  max-width:100%;
+  padding:4px 9px;
+  font-size:10px;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+  background:color-mix(in srgb,var(--surface) 70%,transparent);
+}
+#anime-modal .anime-hero-content>.detail-grid{
+  grid-column:2;
+  grid-row:2;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0 15px;
+  margin-top:5px;
+  min-width:0;
+}
+#anime-modal .detail-grid>div{
+  min-width:0;
+  padding:9px 0 10px;
+  line-height:1.4;
+  font-size:12px;
+  overflow-wrap:anywhere;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);
+}
+#anime-modal .detail-grid b{
+  margin-bottom:4px;
+  font-size:10px;
+  line-height:1.3;
+}
+#anime-modal .modal-close{
+  position:absolute!important;
+  float:none!important;
+  top:17px!important;
+  right:17px!important;
+  width:36px;
+  height:36px;
+  min-width:36px;
+  z-index:35!important;
+  margin:0!important;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--surface) 80%,transparent);
+  backdrop-filter:blur(12px);
+}
+#anime-modal .modal-close:hover{
+  color:var(--accent);
+  border-color:var(--accent);
+}
+#anime-modal .modal-close:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+#anime-modal .modal-tabs{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:7px;
+  overflow-x:auto;
+  margin:13px 0 11px;
+  padding-bottom:4px;
+}
+#anime-modal .modal-tabs .modal-tab{flex:0 0 auto}
+@media(max-width:760px){
+  #anime-modal{padding:8px}
+  #anime-modal .modal-card{
+    width:100%;
+    max-height:calc(100dvh - 16px);
+    padding:10px!important;
+    border-radius:18px;
+  }
+  #anime-modal .anime-hero-content{
+    grid-template-columns:104px minmax(0,1fr);
+    gap:0 12px;
+    padding:12px;
+  }
+  #anime-modal .anime-hero-content>.detail-cover{
+    width:104px;
+    grid-row:1;
+  }
+  #anime-modal .anime-hero-heading{
+    grid-column:2;
+    grid-row:1;
+    padding-right:24px;
+  }
+  #anime-modal .detail-title{
+    font-size:clamp(19px,4.6vw,24px);
+    line-height:1.2;
+    margin:5px 0 9px;
+  }
+  #anime-modal .anime-hero-heading .chips{
+    gap:5px;
+    margin:8px 0 11px;
+  }
+  #anime-modal .anime-hero-heading .chip{
+    padding:4px 7px;
+    font-size:10px;
+  }
+  #anime-modal .anime-hero-content>.detail-grid{
+    grid-column:1 / -1;
+    grid-row:2;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0 12px;
+    margin-top:11px;
+  }
+  #anime-modal .detail-grid>div{padding:8px 0 9px}
+  #anime-modal .modal-close{
+    top:16px!important;
+    right:16px!important;
+    width:34px;
+    height:34px;
+  }
+}
+@media(max-width:380px){
+  #anime-modal .anime-hero-content{
+    grid-template-columns:88px minmax(0,1fr);
+    gap:0 10px;
+    padding:10px;
+  }
+  #anime-modal .anime-hero-content>.detail-cover{width:88px}
+  #anime-modal .anime-hero-heading{padding-right:22px}
+  #anime-modal .detail-title{font-size:18px}
+  #anime-modal .detail-grid{gap:0 9px}
+}

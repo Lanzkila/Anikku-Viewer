@@ -596,11 +596,12 @@
         <div class="anime-hero-bg" style="${bg?`background-image:url('${esc(bg).replace(/'/g,'&#39;')}')`:''}"></div>
         <div class="anime-hero-content">
           ${cover?`<img class="detail-cover" src="${esc(cover)}" alt="">`:'<div class="detail-cover"></div>'}
-          <div>
+          <div class="anime-hero-heading">
             <div class="eyebrow">${esc(sourceName(m))}</div>
             <h2 class="detail-title">${esc(animeTitle(m))}</h2>
             <div class="chips">${genres.slice(0,12).map(g=>`<span class="chip">${esc(g)}</span>`).join('')}</div>
-            <div class="detail-grid">
+          </div>
+          <div class="detail-grid">
               <div><b>Status</b>${esc(statusName(m.customStatus||m.status))}</div>
               <div><b>Progress</b>${seen} / ${eps.length} seen</div>
               <div><b>Unseen</b>${unseen}</div>
@@ -610,7 +611,6 @@
               <div><b>Categories</b>${esc(categories.join(', ')||'—')}</div>
               <div><b>Added</b>${formatDate(m.dateAdded)}</div>
               <div><b>Parent ID</b>${esc(m.parentId||'—')}</div>
-            </div>
           </div>
         </div>
       </section>
@@ -820,7 +820,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=037',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=038',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
