@@ -292,7 +292,51 @@
   }
 
   function animeTitle(m) { return m.customTitle || m.title || '(Untitled anime)'; }
-  function animeCover(m) { return m.customThumbnailUrl || m.thumbnailUrl || ''; }
+  function animeCoverCandidates(m) {
+    if (!m) return [];
+    // Match Intelligence Suite's user-selected cover overrides.
+    let override='';
+    try {
+      const saved=JSON.parse(localStorage.getItem('kirin-ank-v030:covers')||'{}');
+      override=saved[String(m.source??'')+'|'+String(m.url??'')]||'';
+    } catch (_) {}
+    const candidates=[];
+    const add=value=>{
+      if (typeof value!=='string') return;
+      const url=value.trim();
+      if (!url) return;
+      if (/^\/\//.test(url)) candidates.push('https:'+url);
+      else if (/^http:\/\//i.test(url)) {
+        candidates.push(url.replace(/^http:/i,'https:'));
+        candidates.push(url);
+      } else if (/^(https:\/\/|data:image\/|blob:|\.?\.?\/)/i.test(url)) candidates.push(url);
+    };
+    [override,m.customThumbnailUrl,m.thumbnailUrl,m.backgroundUrl].forEach(add);
+    return [...new Set(candidates)];
+  }
+  function animeCover(m) { return animeCoverCandidates(m)[0]||''; }
+  function recoverAnimeCover(event) {
+    const img=event.target;
+    if (!(img instanceof HTMLImageElement) || !img.matches('img[data-anime-cover]')) return;
+    const index=Number(img.dataset.animeCover);
+    const m=state.data?.backupManga?.[index];
+    const attempted=img._coverAttempts||(img._coverAttempts=new Set());
+    attempted.add(img.getAttribute('src')||'');
+    const next=animeCoverCandidates(m).find(url=>!attempted.has(url));
+    if (next) {
+      img.referrerPolicy='no-referrer';
+      img.src=next;
+      return;
+    }
+    // Do not display the browser's broken-image icon if all saved URLs are dead.
+    const fallback=document.createElement('span');
+    const inContinue=!!img.closest('.continue-poster');
+    const inDetail=img.classList.contains('detail-cover');
+    fallback.className=inContinue?'continue-poster-fallback':inDetail?'detail-cover anime-cover-fallback':'anime-cover-fallback';
+    fallback.textContent='▶';
+    fallback.setAttribute('aria-hidden','true');
+    img.replaceWith(fallback);
+  }
   function animeDescription(m) { return m.customDescription || m.description || ''; }
   function animeGenres(m) { return arr(m.customGenre).length ? arr(m.customGenre) : arr(m.genre); }
   function sourceName(m) { return state.sourceMap.get(key64(m.source)) || `Source ${m.source}`; }
@@ -380,7 +424,7 @@
       const pct=clamp(Math.round(x.progress*100),0,100);
       const cover=animeCover(x.m);
       return `<button class="continue-card" type="button" data-open-anime="${x.mi}">
-        <span class="continue-poster">${cover?`<img src="${esc(cover)}" alt="" loading="lazy">`:'<span class="continue-poster-fallback">▶</span>'}</span>
+        <span class="continue-poster">${cover?`<img data-anime-cover="${x.mi}" src="${esc(cover)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:'<span class="continue-poster-fallback">▶</span>'}</span>
         <span class="continue-info">
           <strong>${esc(animeTitle(x.m))}</strong>
           <small>${esc(x.ep.name||`Episode ${x.ep.episodeNumber||''}`)}</small>
@@ -535,7 +579,7 @@
         animeHasFiller(m)?'<span class="library-flag filler">Filler</span>':''
       ].filter(Boolean).join('');
       return `<button class="anime-card" type="button" data-open-anime="${index}">
-        <div class="anime-cover-wrap">${cover?`<img class="anime-cover" src="${esc(cover)}" loading="lazy" alt="">`:'<span class="anime-cover-fallback">▶</span>'}<span class="anime-badge">${unseen.toLocaleString()} unseen</span>${flags?`<span class="library-flags">${flags}</span>`:''}</div>
+        <div class="anime-cover-wrap">${cover?`<img class="anime-cover" data-anime-cover="${index}" src="${esc(cover)}" loading="lazy" alt="" referrerpolicy="no-referrer">`:'<span class="anime-cover-fallback">▶</span>'}<span class="anime-badge">${unseen.toLocaleString()} unseen</span>${flags?`<span class="library-flags">${flags}</span>`:''}</div>
         <div class="anime-card-body">
           <strong>${esc(animeTitle(m))}</strong>
           <div class="anime-meta"><span>${esc(sourceName(m))}</span><span>${seen}/${eps.length}</span></div>
@@ -595,7 +639,7 @@
       <section class="anime-hero">
         <div class="anime-hero-bg" style="${bg?`background-image:url('${esc(bg).replace(/'/g,'&#39;')}')`:''}"></div>
         <div class="anime-hero-content">
-          ${cover?`<img class="detail-cover" src="${esc(cover)}" alt="">`:'<div class="detail-cover"></div>'}
+          ${cover?`<img class="detail-cover" data-anime-cover="${Number(index)}" src="${esc(cover)}" alt="" referrerpolicy="no-referrer">`:'<div class="detail-cover"></div>'}
           <div class="anime-hero-heading">
             <div class="eyebrow">${esc(sourceName(m))}</div>
             <h2 class="detail-title">${esc(animeTitle(m))}</h2>
@@ -790,6 +834,8 @@
     $('#page-size').addEventListener('change',()=>{state.pageSize=num($('#page-size').value)||28;state.page=1;renderLibrary();});
     $('#pager').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=num(b.dataset.page)||1;renderLibrary();window.scrollTo({top:150,behavior:'smooth'});});
     $('#anime-grid').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
+    // 'error' does not bubble from images, so use capture for every view.
+    document.addEventListener('error',recoverAnimeCover,true);
     $('#continue-watching').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
     $$('.subnav-btn[data-explore]').forEach(b=>b.addEventListener('click',()=>renderExplore(b.dataset.explore)));
     $$('[data-explore-jump]').forEach(b=>b.addEventListener('click',()=>{switchView('explore');renderExplore(b.dataset.exploreJump);}));
@@ -820,7 +866,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=038',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=039',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
