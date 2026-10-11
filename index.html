@@ -11,11 +11,11 @@
   <link rel="manifest" href="./manifest.webmanifest?v=021">
   <link rel="icon" href="./assets/icons/app-icon.svg" type="image/svg+xml">
   <title>Kirin Anikku Backup Viewer</title>
-  <link rel="stylesheet" href="./assets/css/app.css?v=039">
+  <link rel="stylesheet" href="./assets/css/app.css?v=041">
   <script defer src="https://cdn.jsdelivr.net/npm/long@5.2.3/umd/index.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/protobufjs@7.5.4/dist/protobuf.min.js"></script>
   <script defer src="./assets/vendor/pako.min.js"></script>
-  <script defer src="./assets/js/app.js?v=040"></script>
+  <script defer src="./assets/js/app.js?v=041"></script>
 </head>
 <body>
   <div class="shell">
@@ -184,6 +184,17 @@
             <article class="tool-card"><h3>Session</h3><p>Close this backup and remove decoded data from memory.</p><button id="clear-session" class="outline-btn">Close backup</button></article>
             <article class="tool-card"><h3>About this build</h3><p>Foundation build for Anikku current + legacy backup inspection. Re-encoding to <code>.tachibk</code> is intentionally not enabled yet.</p></article>
           </div>
+          <article class="panel-card anime-duplicate-tool" id="duplicate-detector">
+            <div class="panel-title"><div><h3>Duplicate Detector</h3><p class="muted">Strong: same source + URL. Possible: matching title. Different sources may be intentional.</p></div></div>
+            <div id="duplicate-summary" aria-live="polite"></div>
+            <div class="anime-duplicate-controls">
+              <label>Type<select id="duplicate-filter" aria-label="Duplicate type"><option value="all">All duplicates</option><option value="strong">Strong only</option><option value="possible">Possible title matches</option></select></label>
+              <label>Search<input id="duplicate-search" type="search" placeholder="Title, source or URL…" aria-label="Search duplicates"></label>
+            </div>
+            <p id="duplicate-count" class="muted"></p>
+            <div id="duplicate-list" class="anime-duplicate-list"></div>
+            <p class="muted anime-duplicate-note">Read-only inspection. No automatic deletion. Possible matches from different sources must be reviewed individually.</p>
+          </article>
           <article class="panel-card diagnostic-panel"><h3>Decoder diagnostic</h3><pre id="debug-output"></pre></article>
         </section>
       </section>

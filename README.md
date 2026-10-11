@@ -42,7 +42,8 @@ Buka, semak dan urus metadata backup anime Anikku terus di browser — tanpa mua
 | **Tracker Center** | Metadata MyAnimeList, AniList, Kitsu, Shikimori, Bangumi, Simkl dan Jellyfin |
 | **Metadata Tools** | Source Health, Feed / Saved Search, Quick Preview dan navigasi papan kekunci |
 | **Library Tools** | Pins tempatan, custom collections, bulk selection dan pemadaman dalam memori |
-| **Backup Intelligence** | Snapshot Vault, perbandingan dua backup, duplicate resolution, Repair Center, integrity grade dan Undo/reset |
+| **Backup Intelligence** | Snapshot Vault, perbandingan dua backup, duplicate resolution (source + URL sama sahaja), Repair Center, integrity grade dan Undo/reset |
+| **Duplicate Detector** | Tools → Duplicate Detector: Strong (source + URL sama) dan Possible (tajuk sepadan), boleh cari, tapis dan buka Anime Info tanpa memadam backup |
 | **Cover Recovery** | Fallback poster/background, pemeriksaan imej rosak, URL retry, local override serta import/eksport override |
 | **Penampilan** | 7 tema, layout responsif untuk HP/desktop, kawalan scroll dan PWA |
 

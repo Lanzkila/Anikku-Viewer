@@ -40,6 +40,7 @@
     libraryLayout:'grid',
     currentView:'dashboard',
     exploreTab:'categories',
+    duplicateFilter:'all',
     settings:{theme:'night',libraryLayout:'grid'},
     debug:[],
   };
@@ -745,6 +746,63 @@
   function openTheme() { $('#theme-modal').classList.remove('hidden'); }
   function closeTheme() { $('#theme-modal').classList.add('hidden'); }
 
+
+  // Use two confidence levels, as in Komikku Viewer.
+  function normalizedDuplicateTitle(m) {
+    return animeTitle(m).normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');
+  }
+  function computeAnimeDuplicates() {
+    const exact=new Map(), titles=new Map();
+    arr(state.data?.backupManga).forEach((m,index)=>{
+      const source=key64(m.source), url=String(m.url||'').trim();
+      if(url){
+        const k=source+'::'+url;
+        if(!exact.has(k))exact.set(k,[]);
+        exact.get(k).push({m,index});
+      }
+      const t=normalizedDuplicateTitle(m);
+      if(t){
+        if(!titles.has(t))titles.set(t,[]);
+        titles.get(t).push({m,index});
+      }
+    });
+    const strong=[...exact.values()].filter(g=>g.length>1);
+    const possible=[...titles.values()].filter(g=>g.length>1&&!g.every(({m})=>
+      String(m.url||'').trim() && String(m.url).trim()===String(g[0].m.url||'').trim()
+      && key64(m.source)===key64(g[0].m.source)
+    ));
+    return {strong,possible};
+  }
+  function renderDuplicates() {
+    if(!state.data)return;
+    const {strong,possible}=computeAnimeDuplicates();
+    const summary=$('#duplicate-summary'), list=$('#duplicate-list'), count=$('#duplicate-count');
+    summary.innerHTML=`<div class="duplicate-stats">
+      <div><strong>${strong.length.toLocaleString()}</strong><span>Strong duplicate groups</span></div>
+      <div><strong>${possible.length.toLocaleString()}</strong><span>Possible title matches</span></div>
+    </div>`;
+    const choice=$('#duplicate-filter').value, q=$('#duplicate-search').value.trim().toLowerCase();
+    const groups=[
+      ...(choice==='possible'?[]:strong.map(g=>({type:'strong',g}))),
+      ...(choice==='strong'?[]:possible.map(g=>({type:'possible',g})))
+    ].filter(({g})=>!q||g.some(({m})=>(animeTitle(m)+' '+sourceName(m)+' '+String(m.url||'')).toLowerCase().includes(q)));
+    const max=100;
+    count.textContent=groups.length
+      ?`Showing ${Math.min(max,groups.length)} of ${groups.length} groups · Tap an anime to inspect`
+      :'No duplicate groups match this filter.';
+    list.innerHTML=groups.slice(0,max).map(({type,g})=>`<section class="anime-duplicate-group">
+      <div class="anime-duplicate-head">
+        <strong>${esc(animeTitle(g[0].m))}</strong>
+        <span class="anime-duplicate-kind ${type}">${type==='strong'?'Strong':'Possible'} · ${g.length} copies</span>
+      </div>
+      <div class="anime-duplicate-items">${g.map(({m,index})=>`<button type="button" class="anime-duplicate-item" data-anime-duplicate-index="${index}">
+        <strong>${esc(animeTitle(m))}</strong>
+        <small>${esc(sourceName(m))} · ${arr(m.episodes).length} episodes · ${seenCount(m)} seen</small>
+        <small class="anime-duplicate-url">${esc(m.url||'No URL in backup')}</small>
+      </button>`).join('')}</div>
+    </section>`).join('')||'<div class="muted">No duplicate groups detected in the selected category.</div>';
+  }
+
   function renderMetadata() {
     const anime=arr(state.data.backupManga);
     const episodes=anime.reduce((n,m)=>n+arr(m.episodes).length,0);
@@ -766,7 +824,7 @@
     if(view==='dashboard') renderDashboard();
     if(view==='library') applyLibraryFilters(false);
     if(view==='explore') renderExplore();
-    if(view==='tools') renderMetadata();
+    if(view==='tools'){renderMetadata();renderDuplicates();}
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -868,6 +926,12 @@
     $('#open-another').addEventListener('click',()=>$('#file-input').click());
     $('#clear-session').addEventListener('click',clearSession);
     $('#export-json').addEventListener('click',exportJson);
+    $('#duplicate-filter').addEventListener('change',renderDuplicates);
+    $('#duplicate-search').addEventListener('input',renderDuplicates);
+    $('#duplicate-list').addEventListener('click',event=>{
+      const b=event.target.closest('button[data-anime-duplicate-index]');
+      if(b)openAnime(Number(b.dataset.animeDuplicateIndex));
+    });
 
     ['search-input','category-filter','source-filter','progress-filter','sort-filter'].forEach(id=>{
       $(`#${id}`).addEventListener(id==='search-input'?'input':'change',()=>applyLibraryFilters(true));
@@ -918,7 +982,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=040',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=041',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 
