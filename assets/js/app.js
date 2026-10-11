@@ -292,50 +292,92 @@
   }
 
   function animeTitle(m) { return m.customTitle || m.title || '(Untitled anime)'; }
-  function animeCoverCandidates(m) {
-    if (!m) return [];
-    // Match Intelligence Suite's user-selected cover overrides.
-    let override='';
+  function coverOverride(m) {
+    if (!m) return '';
     try {
       const saved=JSON.parse(localStorage.getItem('kirin-ank-v030:covers')||'{}');
-      override=saved[String(m.source??'')+'|'+String(m.url??'')]||'';
-    } catch (_) {}
-    const candidates=[];
+      return saved[String(m.source??'')+'|'+String(m.url??'')]||'';
+    } catch (_) { return ''; }
+  }
+  function animeCoverCandidates(m) {
+    if (!m) return [];
+    const urls=[];
     const add=value=>{
       if (typeof value!=='string') return;
       const url=value.trim();
       if (!url) return;
-      if (/^\/\//.test(url)) candidates.push('https:'+url);
+      if (url.startsWith('//')) urls.push('https:'+url);
       else if (/^http:\/\//i.test(url)) {
-        candidates.push(url.replace(/^http:/i,'https:'));
-        candidates.push(url);
-      } else if (/^(https:\/\/|data:image\/|blob:|\.?\.?\/)/i.test(url)) candidates.push(url);
+        urls.push(url.replace(/^http:/i,'https:'));
+        urls.push(url);
+      } else if (/^(https:\/\/|data:image\/|blob:|\.?\.?\/)/i.test(url)) urls.push(url);
     };
-    [override,m.customThumbnailUrl,m.thumbnailUrl,m.backgroundUrl].forEach(add);
-    return [...new Set(candidates)];
+    add(coverOverride(m));
+    [m.customThumbnailUrl,m.thumbnailUrl,m.backgroundUrl].forEach(add);
+    // If two sources contain the EXACT same anime title, borrow only that
+    // backup's actual cover URL. Never guess a different anime or external URL.
+    const title=animeTitle(m).normalize('NFKC').trim().toLowerCase().replace(/\s+/g,' ');
+    if (title.length>=5) {
+      arr(state.data?.backupManga).forEach(other=>{
+        if (other===m || String(other.source)===String(m.source)) return;
+        if (animeTitle(other).normalize('NFKC').trim().toLowerCase().replace(/\s+/g,' ')!==title) return;
+        [coverOverride(other),other.customThumbnailUrl,other.thumbnailUrl,other.backgroundUrl].forEach(add);
+      });
+    }
+    return [...new Set(urls)];
   }
   function animeCover(m) { return animeCoverCandidates(m)[0]||''; }
   function recoverAnimeCover(event) {
     const img=event.target;
-    if (!(img instanceof HTMLImageElement) || !img.matches('img[data-anime-cover]')) return;
-    const index=Number(img.dataset.animeCover);
+    if (!(img instanceof HTMLImageElement)) return;
+    if (!img.matches('#anime-grid img, #continue-watching img, #anime-modal img.detail-cover')) return;
+    // Also handle img elements injected by the cover-recovery suite.
+    const card=img.closest('[data-open-anime]');
+    const attr=img.dataset.animeCover??card?.dataset.openAnime;
+    if (attr==null || attr==='') return;
+    const index=Number(attr);
+    if (!Number.isInteger(index)||index<0) return;
     const m=state.data?.backupManga?.[index];
+    if (!m) return;
     const attempted=img._coverAttempts||(img._coverAttempts=new Set());
     attempted.add(img.getAttribute('src')||'');
     const next=animeCoverCandidates(m).find(url=>!attempted.has(url));
     if (next) {
+      attempted.add(next);
       img.referrerPolicy='no-referrer';
       img.src=next;
       return;
     }
-    // Do not display the browser's broken-image icon if all saved URLs are dead.
+    // Mark this card so the Intelligence Suite cannot reinsert the same dead URL.
+    if (card?.classList.contains('anime-card')) {
+      card.dataset.coverFailed='yes';
+      card.dataset.coverFailedOverride=coverOverride(m);
+      card.classList.add('kvx-broken-cover');
+    }
     const fallback=document.createElement('span');
     const inContinue=!!img.closest('.continue-poster');
     const inDetail=img.classList.contains('detail-cover');
     fallback.className=inContinue?'continue-poster-fallback':inDetail?'detail-cover anime-cover-fallback':'anime-cover-fallback';
-    fallback.textContent='▶';
+    fallback.textContent='▧';
     fallback.setAttribute('aria-hidden','true');
+    fallback.setAttribute('title','Cover unavailable');
     img.replaceWith(fallback);
+  }
+  function checkBrokenAnimeCovers() {
+    document.querySelectorAll('#anime-grid img, #continue-watching img, #anime-modal img.detail-cover').forEach(img=>{
+      if (img.complete && img.naturalWidth===0 && img.hasAttribute('src')) {
+        recoverAnimeCover({target:img});
+      }
+    });
+  }
+  let animeCoverCheckQueued=false;
+  function queueAnimeCoverCheck() {
+    if (animeCoverCheckQueued) return;
+    animeCoverCheckQueued=true;
+    requestAnimationFrame(()=>{
+      animeCoverCheckQueued=false;
+      checkBrokenAnimeCovers();
+    });
   }
   function animeDescription(m) { return m.customDescription || m.description || ''; }
   function animeGenres(m) { return arr(m.customGenre).length ? arr(m.customGenre) : arr(m.genre); }
@@ -434,6 +476,7 @@
       </button>`;
     }).join('') : '<div class="muted">No partially watched episode stored in this backup.</div>';
 
+    queueAnimeCoverCheck();
     const filler=episodes.filter(e=>e.fillermark||e.fillermarkLegacy).length;
     const bookmarked=episodes.filter(e=>e.bookmark).length;
     $('#watch-summary').innerHTML = [
@@ -596,6 +639,7 @@
     $('#pager').innerHTML=pageButtons.join('');
     applyLibraryLayout(false);
     requestAnimationFrame(updateScrollBoundaryButtons);
+    queueAnimeCoverCheck();
   }
 
   function renderExplore(tab=state.exploreTab) {
@@ -694,6 +738,7 @@
     renderTab('overview');
     $$('.modal-tab').forEach(b=>b.addEventListener('click',()=>renderTab(b.dataset.detailTab)));
     $('#anime-modal').classList.remove('hidden');
+    queueAnimeCoverCheck();
   }
 
   function closeModal() { $('#anime-modal').classList.add('hidden'); }
@@ -836,6 +881,13 @@
     $('#anime-grid').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
     // 'error' does not bubble from images, so use capture for every view.
     document.addEventListener('error',recoverAnimeCover,true);
+    // Some images fail before onerror is wired; the suite may also inject new img nodes.
+    const posterObserver=new MutationObserver(queueAnimeCoverCheck);
+    ['#anime-grid','#continue-watching','#modal-content'].forEach(selector=>{
+      const node=$(selector);
+      if(node)posterObserver.observe(node,{childList:true,subtree:true});
+    });
+    queueAnimeCoverCheck();
     $('#continue-watching').addEventListener('click',e=>{const b=e.target.closest('[data-open-anime]');if(b)openAnime(b.dataset.openAnime);});
     $$('.subnav-btn[data-explore]').forEach(b=>b.addEventListener('click',()=>renderExplore(b.dataset.explore)));
     $$('[data-explore-jump]').forEach(b=>b.addEventListener('click',()=>{switchView('explore');renderExplore(b.dataset.exploreJump);}));
@@ -866,7 +918,7 @@
 
   function registerPwa() {
     if('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js?v=039',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
+      navigator.serviceWorker.register('./sw.js?v=040',{updateViaCache:'none'}).then(reg=>reg.update()).catch(e=>log(`Service worker: ${e.message}`));
     }
   }
 

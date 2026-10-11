@@ -50,7 +50,61 @@ function renderCoverSummary(){const e=$('#kvx-cover-summary');if(!e)return;const
 function renderCovers(){const x=coverSummary();$('#kvx-body').innerHTML=`<div id="kvx-cover-summary" class="kvx-grid">${stat('Scanned',x.scanned)}${stat('OK',x.ok)}${stat('Recovered / override',x.override)}${stat('Missing / broken',x.missing+x.broken)}</div><section class="kvx-panel"><div class="kvx-panel-head"><span><h3>Cover Recovery Center</h3><small style="color:var(--kvx-muted)">Priority: local override → customThumbnailUrl → thumbnailUrl → backgroundUrl → normalized HTTPS retry.</small></span><span class="kvx-pills"><button class="kvx-btn primary" data-kvx-action="scan-400">Scan 400</button><button class="kvx-btn" data-kvx-action="scan-all">Scan all</button><button class="kvx-btn" data-kvx-action="export-cover-overrides">Export overrides</button><button class="kvx-btn" data-kvx-action="import-cover-overrides">Import</button></span></div><div class="kvx-toolbar"><select id="kvx-cover-filter" class="kvx-select"><option value="issues">Issues first</option><option value="all">All anime</option><option value="missing">Missing URL</option><option value="broken">Broken URL</option><option value="override">Local override</option></select><input id="kvx-cover-search" class="kvx-input" placeholder="Search title/source…"></div><div id="kvx-cover-grid" class="kvx-cover-grid"></div></section>`;const draw=()=>{const q=norm($('#kvx-cover-search').value),f=$('#kvx-cover-filter').value;let list=A(state.data.backupManga).filter(m=>!q||norm(`${title(m)} ${source(m)}`).includes(q));list=list.filter(m=>{const st=state.cover.get(key(m));if(f==='missing')return !cover(m);if(f==='broken')return st?.state==='broken';if(f==='override')return !!state.coverOverrides[key(m)];if(f==='issues')return !cover(m)||st?.state==='broken'||st?.state==='missing';return true});$('#kvx-cover-grid').innerHTML=list.slice(0,350).map(coverCard).join('')||'<div class="kvx-empty">No matching cover issue.</div>'};$('#kvx-cover-filter').onchange=draw;$('#kvx-cover-search').oninput=draw;draw()}
 async function fileToCover(file){if(!file?.type?.startsWith('image/'))throw new Error('Choose an image file');const url=URL.createObjectURL(file);try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Cannot read image'));i.src=url});const maxW=360,maxH=540,scale=Math.min(1,maxW/im.naturalWidth,maxH/im.naturalHeight),w=Math.max(1,Math.round(im.naturalWidth*scale)),h=Math.max(1,Math.round(im.naturalHeight*scale)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);return c.toDataURL('image/jpeg',.82)}finally{URL.revokeObjectURL(url)}}
 async function coverAction(a,k){const m=A(state.data.backupManga).find(x=>key(x)===k);if(!m)return;if(a==='retry'){state.cover.delete(k);for(const u of candidates(m)){if(await probe(u)){state.cover.set(k,{state:state.coverOverrides[k]?'override':'ok',url:u});break}}if(!state.cover.has(k))state.cover.set(k,{state:cover(m)?'broken':'missing',url:cover(m)});renderCovers();repairDomCovers();return}if(a==='url'){const u=prompt('Cover image URL',state.coverOverrides[k]||cover(m)||'');if(!u?.trim())return;state.coverOverrides[k]=u.trim();SV('covers',state.coverOverrides);state.cover.set(k,{state:'override',url:u.trim()});renderCovers();repairDomCovers();return}if(a==='file'){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{try{const data=await fileToCover(inp.files[0]);state.coverOverrides[k]=data;SV('covers',state.coverOverrides);state.cover.set(k,{state:'override',url:data});renderCovers();repairDomCovers();toast('Local cover saved')}catch(e){toast(e.message)}};inp.click();return}if(a==='clear'){delete state.coverOverrides[k];SV('covers',state.coverOverrides);state.cover.delete(k);renderCovers();repairDomCovers()}}
-function repairDomCovers(){if(!state.data)return;const byTitle=new Map(A(state.data.backupManga).map(m=>[norm(title(m)),m]));$$('#anime-grid > *').forEach(card=>{const tx=card.querySelector('strong,h3,.anime-title,.card-title,.title')?.textContent,m=byTitle.get(norm(tx));if(!m)return;const k=key(m),cs=candidates(m);let img=card.querySelector('img');const apply=async()=>{let info=state.cover.get(k);if(!info&&cs.length){for(const u of cs){if(await probe(u)){info={state:state.coverOverrides[k]?'override':'ok',url:u};state.cover.set(k,info);break}}}if(info?.url){if(!img){const box=card.querySelector('.anime-cover-wrap,.cover-wrap,.card-cover,.cover,[class*=cover]');if(box){img=document.createElement('img');img.style.cssText='width:100%;height:100%;object-fit:cover;display:block';box.prepend(img)}}if(img){img.referrerPolicy='no-referrer';img.src=info.url;card.classList.remove('kvx-broken-cover')}}else card.classList.add('kvx-broken-cover')};if(!img||!img.getAttribute('src')||(img.complete&&img.naturalWidth<3))apply();else img.addEventListener('error',apply,{once:true})})}
+function repairDomCovers(){
+  if(!state.data)return;
+  const all=A(state.data.backupManga);
+  const byTitle=new Map(all.map(m=>[norm(title(m)),m]));
+  $$('#anime-grid > .anime-card').forEach(card=>{
+    const tx=card.querySelector('strong,h3,.anime-title,.card-title,.title')?.textContent;
+    const idx=Number(card.dataset.openAnime);
+    const candidate=Number.isInteger(idx)&&idx>=0?all[idx]:null;
+    const m=candidate&&norm(title(candidate))===norm(tx)?candidate:byTitle.get(norm(tx));
+    if(!m)return;
+    const k=key(m), override=state.coverOverrides[k]||'';
+    // Base viewer has already exhausted these URLs; don't resurrect a broken img.
+    if(card.dataset.coverFailed==='yes'&&card.dataset.coverFailedOverride===override)return;
+    let img=card.querySelector('.anime-cover-wrap img');
+    if(img&&(!img.complete||img.naturalWidth>2)&&(!override||img.getAttribute('src')===override))return;
+    const apply=async()=>{
+      let info=state.cover.get(k);
+      if(info?.state==='broken'||info?.state==='missing'){
+        card.classList.add('kvx-broken-cover');
+        return;
+      }
+      if(!info){
+        for(const u of candidates(m)){
+          if(await probe(u)){
+            info={state:override?'override':'ok',url:u};
+            state.cover.set(k,info);
+            break;
+          }
+        }
+      }
+      if(!card.isConnected)return;
+      if(!info?.url || info.state==='broken' || info.state==='missing'){
+        card.classList.add('kvx-broken-cover');
+        return;
+      }
+      img=card.querySelector('.anime-cover-wrap img');
+      if(!img){
+        const box=card.querySelector('.anime-cover-wrap');
+        if(!box)return;
+        const placeholder=box.querySelector('.anime-cover-fallback');
+        if(placeholder)placeholder.remove();
+        img=document.createElement('img');
+        img.className='anime-cover';
+        img.loading='lazy';
+        box.prepend(img);
+      }
+      img.setAttribute('data-anime-cover',card.dataset.openAnime||'');
+      img.referrerPolicy='no-referrer';
+      if(img.getAttribute('src')!==info.url)img.src=info.url;
+      card.classList.remove('kvx-broken-cover');
+      card.dataset.coverFailed='no';
+    };
+    apply();
+  });
+}
 function observeLibrary(){if(observeLibrary._done)return;observeLibrary._done=true;const t=$('#anime-grid');if(!t)return;new MutationObserver(()=>{clearTimeout(observeLibrary.t);observeLibrary.t=setTimeout(repairDomCovers,120)}).observe(t,{childList:true,subtree:true})}
 function renderTracking(){const m=A(state.data.backupManga),map=new Map();m.forEach(x=>A(x.tracking).forEach(t=>{const id=N(t.syncId),o=map.get(id)||{id,count:0,mismatch:0,score:0,scored:0};o.count++;if(N(t.score)>0){o.score+=N(t.score);o.scored++}if(Math.abs(N(t.lastEpisodeSeen)-seen(x))>2)o.mismatch++;map.set(id,o)}));const rows=[...map.values()].sort((a,b)=>b.count-a.count);$('#kvx-body').innerHTML=`<div class="kvx-grid">${stat('Tracked anime',m.filter(x=>A(x.tracking).length).length)}${stat('Tracker services',rows.length)}${stat('Progress mismatches',rows.reduce((n,x)=>n+x.mismatch,0))}${stat('Coverage',m.length?`${Math.round(m.filter(x=>A(x.tracking).length).length/m.length*100)}%`:'0%')}</div><section class="kvx-panel"><h3>Tracker Center</h3><div class="kvx-list">${rows.map(x=>row(tracker(x.id),`${x.count} anime · average score ${x.scored?(x.score/x.scored).toFixed(1):'—'}`,`${x.mismatch} mismatch`)).join('')||'<div class="kvx-empty">No tracking data.</div>'}</div></section><section class="kvx-panel"><h3>Tracked anime</h3><div class="kvx-list">${m.filter(x=>A(x.tracking).length).slice(0,250).map(x=>row(title(x),A(x.tracking).map(t=>`${tracker(t.syncId)} ${t.lastEpisodeSeen||0}/${t.totalEpisodes||'?'}`).join(' · '),`${seen(x)}/${A(x.episodes).length} local`)).join('')||'<div class="kvx-empty">No tracked anime.</div>'}</div></section>`}
 function sourceHealth(){return A(state.data.backupSources).map(s=>{const ms=A(state.data.backupManga).filter(m=>S(m.source)===S(s.sourceId));return{id:S(s.sourceId),name:s.name||`Source ${s.sourceId}`,count:ms.length,noCover:ms.filter(m=>!cover(m)).length,noEpisodes:ms.filter(m=>!A(m.episodes).length).length,unseen:ms.reduce((n,m)=>n+unseen(m),0)}}).sort((a,b)=>b.count-a.count)}
