@@ -3,7 +3,11 @@
 ## Recent commits (automatic)
 
 <!-- AUTO-CHANGELOG:START -->
+### 2026-10-11 (MYT)
+- **17:41** · **Fixed** — fix(ui): make Anikku anime details compact on mobile while preserving transparent backdrop ([`4854661`](https://github.com/Lanzkila/Anikku-Viewer/commit/48546612baccae02f552545cd9707ab96ce64ec6)) <!-- commit:48546612baccae02f552545cd9707ab96ce64ec6 -->
+
 ### 2026-10-08 (MYT)
+- **10:08** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`cde1798`](https://github.com/Lanzkila/Anikku-Viewer/commit/cde179824b98f36725f1aa333818311369fc50b4)) <!-- commit:cde179824b98f36725f1aa333818311369fc50b4 -->
 - **10:08** · **Fixed** — fix(ui): disable scroll arrows at top and bottom in Anikku viewer ([`b482c26`](https://github.com/Lanzkila/Anikku-Viewer/commit/b482c26a73d400c6234ce8d7620830d6ac7cadfe)) <!-- commit:b482c26a73d400c6234ce8d7620830d6ac7cadfe -->
 - **10:01** · **Fixed** — fix(library): fill desktop 7-column grid with 28 anime per page ([`c06c754`](https://github.com/Lanzkila/Anikku-Viewer/commit/c06c75422bbb8062a4470f7bf2542b86ebbb6a7e)) <!-- commit:c06c75422bbb8062a4470f7bf2542b86ebbb6a7e -->
 - **10:01** · **Docs** — docs(changelog): auto-update commit history \[skip ci\] ([`5690ad5`](https://github.com/Lanzkila/Anikku-Viewer/commit/5690ad59f34559bc4c0bea02c8ef36a3800517c6)) <!-- commit:5690ad59f34559bc4c0bea02c8ef36a3800517c6 -->
